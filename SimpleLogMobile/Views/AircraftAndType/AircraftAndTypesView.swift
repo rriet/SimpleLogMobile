@@ -25,7 +25,7 @@ struct AircraftAndTypesView: View {
                     Text("Aircrafts")
                         .font(.largeTitle)
                         .padding(.vertical, 1)
-//                    AircraftsView()
+                    AircraftsView()
                 }
                 .frame(minWidth: 300, maxWidth: .infinity)
             }
@@ -46,7 +46,7 @@ struct AircraftAndTypesView: View {
                     TypesView()
                 } else if selectedView == "Aircrafts" {
                     // Render the Aircrafts view
-//                    AircraftsView()
+                    AircraftsView()
                 }
             }
             .frame(maxHeight: .infinity)

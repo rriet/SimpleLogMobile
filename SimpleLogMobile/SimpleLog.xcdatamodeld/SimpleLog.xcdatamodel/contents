@@ -1,17 +1,25 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24C101" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="AircraftType" representedClassName="AircraftType" syncable="YES">
-        <attribute name="categoryString" optional="YES" attributeType="String"/>
-        <attribute name="complex" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="efis" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="engineType" optional="YES" attributeType="String"/>
-        <attribute name="family" optional="YES" attributeType="String"/>
-        <attribute name="highPerformance" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="isLocked" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="maker" optional="YES" attributeType="String"/>
-        <attribute name="mtow" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="multiEngine" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="multiPilot" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="name" optional="YES" attributeType="String"/>
+    <entity name="Aircraft" representedClassName="Aircraft" isAbstract="YES" syncable="YES" codeGenerationType="category">
+        <attribute name="aircraftMtow" optional="YES" attributeType="Integer 64" usesScalarValueType="YES"/>
+        <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="isSimulator" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="registration" attributeType="String"/>
+        <relationship name="aircraftType" optional="YES" maxCount="1" deletionRule="No Action" destinationEntity="AircraftType" inverseName="aircrafts" inverseEntity="AircraftType"/>
+    </entity>
+    <entity name="AircraftType" representedClassName="AircraftType" syncable="YES" codeGenerationType="category">
+        <attribute name="categoryString" attributeType="String" defaultValueString="Landplane"/>
+        <attribute name="complex" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="efis" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="engineType" attributeType="String" defaultValueString="Jet"/>
+        <attribute name="family" attributeType="String" defaultValueString=""/>
+        <attribute name="highPerformance" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="maker" attributeType="String" defaultValueString=""/>
+        <attribute name="mtow" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="multiEngine" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="multiPilot" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="name" attributeType="String" defaultValueString=""/>
+        <relationship name="aircrafts" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="Aircraft" inverseName="aircraftType" inverseEntity="Aircraft"/>
     </entity>
 </model>

@@ -9,7 +9,7 @@ import SwiftUI
 
 struct TypeRowView: View {
     
-    var aircraft: AircraftType
+    var aircraftType: AircraftType
     let onDelete: () -> Void
     let onEdit: () -> Void
     let onTapGesture: () -> Void
@@ -18,37 +18,47 @@ struct TypeRowView: View {
     var body: some View {
         Section(){
             HStack(alignment: .top) {
-                Text(aircraft.name.strUnwrap)
+//                VStack{
+//                    ForEach (
+//                        aircraftType.aircrafts?.allObjects as? [Aircraft] ?? [],
+//                        id: \.self
+//                    ) { acft in
+//                        Text(acft.registration.strUnwrap)
+//                    }
+//                }
+                Text(aircraftType.name.strUnwrap)
+                    .lineLimit(1)
                     .font(.title2)
                     .frame(maxWidth: .infinity, alignment: .leading)
                 VStack(alignment: .leading) {
-                    Text("Maker: \(aircraft.maker.strUnwrap) lkjsdhf sldkjhf lasdfgh salkfg aksdjhfg")
-                    Text("Engine: \(aircraft.engineType.strUnwrap)")
-                    Text("Category: \(aircraft.categoryString.strUnwrap)")
-                    Text("MTOW: \(aircraft.mtow)")
+                    Text("Maker: \(aircraftType.maker.strUnwrap)")
+                        .lineLimit(1)
+                    Text("Engine: \(aircraftType.engineType.strUnwrap)")
+                    Text("Category: \(aircraftType.categoryString.strUnwrap)")
+                    Text("MTOW: \(aircraftType.mtow)")
                 }
                 .font(.subheadline)
                 .frame(maxWidth: .infinity)
                 VStack(alignment: .leading) {
                     Text("EFIS")
                         .foregroundStyle(
-                            aircraft.efis ? .blue : .secondaryBackground
+                            aircraftType.efis ? .blue : .secondaryBackground
                         )
                     Text("Complex")
                         .foregroundStyle(
-                            aircraft.complex ? .blue : .secondaryBackground
+                            aircraftType.complex ? .blue : .secondaryBackground
                         )
                     Text("HighPerf")
                         .foregroundStyle(
-                            aircraft.highPerformance ? .blue : .secondaryBackground
+                            aircraftType.highPerformance ? .blue : .secondaryBackground
                         )
                     Text("MultiPilot")
                         .foregroundStyle(
-                            aircraft.multiPilot ? .blue : .secondaryBackground
+                            aircraftType.multiPilot ? .blue : .secondaryBackground
                         )
                     Text("MultiEngine")
                         .foregroundStyle(
-                            aircraft.multiEngine ? .blue : .secondaryBackground
+                            aircraftType.multiEngine ? .blue : .secondaryBackground
                         )
                 }
                 .font(.subheadline)
@@ -59,7 +69,7 @@ struct TypeRowView: View {
             .listRowBackground(Color.theme.background)
             .swipeActions(allowsFullSwipe: false) {
                 SwipeActionsView<AircraftType>(
-                    item: aircraft,
+                    item: aircraftType,
                     onDelete: onDelete,
                     onEdit: onEdit,
                     onToggleLock: onToggleLock
