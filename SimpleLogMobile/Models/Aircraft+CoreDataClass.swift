@@ -15,4 +15,8 @@ public class Aircraft: NSManagedObject, SwipeableItem {
     var allowDelete: Bool {
         true
     }
+    
+    var getType: AircraftType {
+        self.aircraftType ?? AircraftType()
+    }
 }

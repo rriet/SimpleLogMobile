@@ -5,7 +5,7 @@
         <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isSimulator" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="registration" attributeType="String"/>
-        <relationship name="aircraftType" optional="YES" maxCount="1" deletionRule="No Action" destinationEntity="AircraftType" inverseName="aircrafts" inverseEntity="AircraftType"/>
+        <relationship name="aircraftType" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AircraftType" inverseName="aircrafts" inverseEntity="AircraftType"/>
     </entity>
     <entity name="AircraftType" representedClassName="AircraftType" syncable="YES" codeGenerationType="category">
         <attribute name="categoryString" attributeType="String" defaultValueString="Landplane"/>
@@ -20,6 +20,6 @@
         <attribute name="multiEngine" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="multiPilot" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="name" attributeType="String" defaultValueString=""/>
-        <relationship name="aircrafts" optional="YES" toMany="YES" deletionRule="Deny" destinationEntity="Aircraft" inverseName="aircraftType" inverseEntity="Aircraft"/>
+        <relationship name="aircrafts" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="aircraftType" inverseEntity="Aircraft"/>
     </entity>
 </model>

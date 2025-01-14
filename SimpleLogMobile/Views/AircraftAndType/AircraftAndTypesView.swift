@@ -10,6 +10,7 @@ import SwiftUI
 struct AircraftAndTypesView: View {
     @State var selectedView: String = "Types"
     
+    @StateObject var aircraftTypeVM = AircraftTypeViewModel.shared
     
     var body: some View {
         ViewThatFits {
@@ -53,6 +54,7 @@ struct AircraftAndTypesView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(Color.theme.secondaryBackground))
+        .environmentObject(aircraftTypeVM)
     }
 }
 

@@ -18,19 +18,11 @@ struct AircraftRowView: View {
     var body: some View {
         Section(){
             VStack(alignment: .leading) {
-                //                VStack{
-                //                    ForEach (
-                //                        aircraftType.aircrafts?.allObjects as? [Aircraft] ?? [],
-                //                        id: \.self
-                //                    ) { acft in
-                //                        Text(acft.registration.strUnwrap)
-                //                    }
-                //                }
                 Text(aircraft.registration.strUnwrap)
                     .lineLimit(1)
                     .font(.title2)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text(aircraft.aircraftType?.name ?? "")
+                Text(aircraft.getType.name.strUnwrap)
             }
             .frame(maxWidth: .infinity)
             .clipped()

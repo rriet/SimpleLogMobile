@@ -17,4 +17,8 @@ struct SimpleLogMobileApp: App {
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
+    
+    init() {
+        print(URL.applicationSupportDirectory.path(percentEncoded: false))
+    }
 }

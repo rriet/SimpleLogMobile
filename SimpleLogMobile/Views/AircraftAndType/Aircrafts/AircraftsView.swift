@@ -12,6 +12,8 @@ struct AircraftsView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     
+    @EnvironmentObject var aircraftTypeVM: AircraftTypeViewModel
+    
     @FetchRequest(
         sortDescriptors: [
             NSSortDescriptor(keyPath: \Aircraft.aircraftType?.name, ascending: true),
@@ -24,7 +26,7 @@ struct AircraftsView: View {
     var groups: [String: [Aircraft]] {
         Dictionary(
             grouping: aircraftList,
-            by: { $0.aircraftType?.name ?? "" }
+            by: { $0.getType.name.strUnwrap }
         )
     }
     
@@ -47,7 +49,13 @@ struct AircraftsView: View {
                             AircraftRowView(
                                 aircraft: aircraft,
                                 onDelete: {
-                                    
+                                    viewContext.delete(aircraft)
+                                    do {
+                                        try viewContext.save()
+                                        aircraftTypeVM.fetchTypeData()
+                                    } catch {
+                                        print("Failed to delete aircraft: \(error.localizedDescription)")
+                                    }
                                 },
                                 onEdit: {
                                     
@@ -83,7 +91,7 @@ struct AircraftsView: View {
                     .font(.title)
             ),
             action: {
-                //                showAddEdit.toggle()
+                showAddEdit.toggle()
             }
         )
         

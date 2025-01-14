@@ -13,14 +13,20 @@ import CoreData
 public class AircraftType: NSManagedObject, SwipeableItem {
     
     var allowDelete: Bool {
-        true
+        !self.isLocked && !self.hasAircraft
     }
     
     /// Indicates whether the Type has any associated Aircraft.
     /// - Returns: `true` if the Type has one or more Aircraft; otherwise, `false`.
     var hasAircraft: Bool {
-        //        !aircrafts.isEmpty
-        false
+        !self.aircraftsArray.isEmpty
+    }
+    
+    var aircraftsArray: [Aircraft] {
+        let acfts = self.aircrafts as? Set<Aircraft> ?? []
+        return acfts.sorted {
+            $0.registration ?? "" < $1.registration ?? ""
+        }
     }
     
     /// Returns a list of `AircraftModel` instances associated with this aircraft type.

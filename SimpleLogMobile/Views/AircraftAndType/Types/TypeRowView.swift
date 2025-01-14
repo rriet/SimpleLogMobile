@@ -9,7 +9,8 @@ import SwiftUI
 
 struct TypeRowView: View {
     
-    var aircraftType: AircraftType
+//    @Binding var aircraftType: AircraftType
+    @ObservedObject var aircraftType: AircraftType
     let onDelete: () -> Void
     let onEdit: () -> Void
     let onTapGesture: () -> Void
@@ -18,14 +19,6 @@ struct TypeRowView: View {
     var body: some View {
         Section(){
             HStack(alignment: .top) {
-//                VStack{
-//                    ForEach (
-//                        aircraftType.aircrafts?.allObjects as? [Aircraft] ?? [],
-//                        id: \.self
-//                    ) { acft in
-//                        Text(acft.registration.strUnwrap)
-//                    }
-//                }
                 Text(aircraftType.name.strUnwrap)
                     .lineLimit(1)
                     .font(.title2)
