@@ -18,5 +18,6 @@ struct ColorTheme {
     let foreground = Color("ForegroundColor")
     let secondaryBackground = Color("SecondaryBackgroundColor")
     let secondaryForeground = Color("SecondaryForegroundColor")
+    let inactive = Color("Inactive")
     
 }

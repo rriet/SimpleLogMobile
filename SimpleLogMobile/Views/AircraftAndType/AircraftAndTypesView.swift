@@ -10,7 +10,7 @@ import SwiftUI
 struct AircraftAndTypesView: View {
     @State var selectedView: String = "Types"
     
-    @StateObject var aircraftTypeVM = AircraftTypeViewModel.shared
+    @StateObject var aircraftTypeVM = AircraftTypeViewModel()
     
     var body: some View {
         ViewThatFits {
@@ -57,7 +57,3 @@ struct AircraftAndTypesView: View {
         .environmentObject(aircraftTypeVM)
     }
 }
-
-//#Preview {
-//    AircraftAndTypesView()
-//}

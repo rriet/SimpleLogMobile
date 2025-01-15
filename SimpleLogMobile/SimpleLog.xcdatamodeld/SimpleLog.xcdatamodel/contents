@@ -10,8 +10,9 @@
     <entity name="AircraftType" representedClassName="AircraftType" syncable="YES" codeGenerationType="category">
         <attribute name="categoryString" attributeType="String" defaultValueString="Landplane"/>
         <attribute name="complex" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
+        <attribute name="designator" attributeType="String" defaultValueString=""/>
         <attribute name="efis" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
-        <attribute name="engineType" attributeType="String" defaultValueString="Jet"/>
+        <attribute name="engineTypeString" attributeType="String" defaultValueString="Jet"/>
         <attribute name="family" attributeType="String" defaultValueString=""/>
         <attribute name="highPerformance" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
@@ -19,7 +20,6 @@
         <attribute name="mtow" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="multiEngine" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="multiPilot" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
-        <attribute name="name" attributeType="String" defaultValueString=""/>
         <relationship name="aircrafts" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="aircraftType" inverseEntity="Aircraft"/>
     </entity>
 </model>

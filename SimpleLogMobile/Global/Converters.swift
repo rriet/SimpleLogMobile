@@ -17,3 +17,11 @@ func stringToOptionalPositiveInt(_ stringValue: String) -> Int? {
     }
     return value
 }
+
+func formatNumericValue<T: Numeric>(_ value: T) -> String {
+    let formatter = NumberFormatter()
+    formatter.numberStyle = .decimal
+    formatter.groupingSeparator = "," // Default separator based on locale
+    formatter.maximumFractionDigits = value is Double ? 2 : 0 // Allow decimals only for Double
+    return formatter.string(from: NSNumber(value: Double("\(value)") ?? 0)) ?? "\(value)"
+}

@@ -16,7 +16,7 @@ struct AircraftsView: View {
     
     @FetchRequest(
         sortDescriptors: [
-            NSSortDescriptor(keyPath: \Aircraft.aircraftType?.name, ascending: true),
+            NSSortDescriptor(keyPath: \Aircraft.aircraftType?.designator, ascending: true),
             NSSortDescriptor(keyPath: \Aircraft.registration, ascending: true)
         ],
         animation: .default
@@ -26,7 +26,7 @@ struct AircraftsView: View {
     var groups: [String: [Aircraft]] {
         Dictionary(
             grouping: aircraftList,
-            by: { $0.getType.name.strUnwrap }
+            by: { $0.getType.designator.strUnwrap }
         )
     }
     
@@ -52,7 +52,7 @@ struct AircraftsView: View {
                                     viewContext.delete(aircraft)
                                     do {
                                         try viewContext.save()
-                                        aircraftTypeVM.fetchTypeData()
+                                        try aircraftTypeVM.fetchTypeData()
                                     } catch {
                                         print("Failed to delete aircraft: \(error.localizedDescription)")
                                     }

@@ -16,7 +16,8 @@ struct InputField: View {
     private let minLength: Int?
     private let maxLength: Int?
     private let inputType: InputType
-//    private let capitalization: TextInputAutocapitalization = .
+    private let capitalization: TextInputAutocapitalization
+    
     // Custom validation closure
     private let validation: ((String) -> ErrorType?)?
     
@@ -57,7 +58,7 @@ struct InputField: View {
         minLength: Int? = nil,
         maxLength: Int? = nil,
         inputType: InputType = .any,
-//        capitalization: TextInputAutocapitalization = .never,
+        capitalization: TextInputAutocapitalization = .never,
         customValidation: ((String) -> ErrorType?)? = nil
     ) {
         self.placeholder = placeholder
@@ -67,7 +68,7 @@ struct InputField: View {
         self.minLength = minLength
         self.maxLength = maxLength
         self.inputType = inputType
-//        self.capitalization = capitalization
+        self.capitalization = capitalization
         self.validation = customValidation
     }
     
@@ -85,7 +86,7 @@ struct InputField: View {
                         .autocorrectionDisabled()
                     /// Avoid Apple BUG https://forums.developer.apple.com/forums/thread/738726
                         .onLongPressGesture(minimumDuration: 0.0) { }
-//                        .textInputAutocapitalization(capitalization)
+                        .textInputAutocapitalization(capitalization)
                         .onChange(of: text, validateInput)
                         .onAppear(perform: validateInput)
                     

@@ -10,6 +10,7 @@ import SwiftUI
 enum AlertConfiguration {
     case simple(title: String, message: String)
     case confirmation(title: String, message: String, confirmAction: () -> Void)
+    case error(details: ErrorDetails)
 }
 
 struct AlertInfo: Identifiable {
@@ -34,6 +35,12 @@ class AlertManager: ObservableObject {
                     message: Text(message),
                     primaryButton: .destructive(Text("Confirm"), action: confirmAction),
                     secondaryButton: .cancel()
+                )
+            case .error(let details):
+                return Alert(
+                    title: Text(details.title),
+                    message: Text(details.message),
+                    dismissButton: .default(Text("OK"))
                 )
         }
     }

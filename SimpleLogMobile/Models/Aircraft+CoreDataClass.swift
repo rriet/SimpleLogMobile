@@ -19,4 +19,8 @@ public class Aircraft: NSManagedObject, SwipeableItem {
     var getType: AircraftType {
         self.aircraftType ?? AircraftType()
     }
+    
+    var mtowString: String {
+        formatNumericValue(self.aircraftMtow)
+    }
 }

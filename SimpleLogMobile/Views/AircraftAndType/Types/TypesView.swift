@@ -11,16 +11,6 @@ import CoreData
 struct TypesView: View {
     
     @EnvironmentObject var aircraftTypeVM: AircraftTypeViewModel
-    @Environment(\.managedObjectContext) private var viewContext
-    
-    @FetchRequest(
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \AircraftType.family, ascending: true),
-            NSSortDescriptor(keyPath: \AircraftType.name, ascending: true)
-        ],
-        animation: .default
-    )
-    private var typeList: FetchedResults<AircraftType>
     
     @State private var selectedType: AircraftType? = nil
     @State private var showAddEdit = false
@@ -47,16 +37,22 @@ struct TypesView: View {
                                     deleteType(aircraftType)
                                 },
                                 onEdit: {
-
+                                    editType(aircraftType)
                                 },
                                 onTapGesture: {
                                     
                                 },
                                 onToggleLock: {
-                                    aircraftTypeVM.toggleLocked(aircraftType)
+                                    try! aircraftTypeVM.toggleLocked(aircraftType)
                                 }
                             )
                         }
+                    }
+                    // Spacer to allow last entry to scroll pass the + button
+                    Section {
+                        Spacer()
+                            .frame(height: 100)
+                            .listRowBackground(Color.clear)
                     }
                 }
                 .listSectionSpacing(7)
@@ -75,14 +71,7 @@ struct TypesView: View {
         .alert(item: $alertManager.currentAlert) { alertInfo in
             alertManager.getAlert(alertInfo)
         }
-//        .onAppear(){
-//            typeVM.fetchTypeData()
-//        }
-//        .onChange(of: refreshTypes) {
-//            print("Teste")
-//            refreshTypes.toggle()
-//            typeVM.fetchTypeData()
-//        }
+
         // Hides the background of the list, so the color propagates from the back
         .scrollContentBackground(.hidden)
         .floatingButton(
@@ -92,36 +81,53 @@ struct TypesView: View {
                     .font(.title)
             ),
             action: {
-//                showAddEdit.toggle()
-                aircraftTypeVM.addRandomTypes()
+                newType()
+//                aircraftTypeVM.addRandomTypes()
             }
         )
         
         // Edit Screen
         // sheet works on all systems, but is dismissible on IOS, not dismissible on MacOS
         .sheet(isPresented: $showAddEdit) {
-            // TODO:
+            AddEditTypeView($selectedType)
+                .interactiveDismissDisabled()
         }
     }
     
+    private func newType() {
+        self.selectedType = nil
+        showAddEdit.toggle()
+    }
+    
+    private func editType(_ selectedType: AircraftType) {
+        self.selectedType = selectedType
+        showAddEdit.toggle()
+    }
+    
     private func deleteType(_ typeToDelete: AircraftType) {
+        
+        // Verify if type has associated aircrafts
         guard typeToDelete.allowDelete else {
             alertManager.showAlert(.simple(
-                title: "Cannot Delete Aircraft",
-                message: "The selected aircraft cannot be deleted because it is associated with one or more flights."))
+                title: "Cannot Delete Aircraft Type",
+                message: "The selected Type cannot be deleted because it is associated with one or more Aircraft."))
             return
         }
         
         alertManager.showAlert(.confirmation(
-            title: "Delete Aircraft",
-            message: "Are you sure you want to delete this aircraft?",
+            title: "Delete Aircraft Type",
+            message: "Are you sure you want to delete this Aircraft Type?",
             confirmAction: {
-                aircraftTypeVM.deleteType(typeToDelete)
+                do {
+                    try aircraftTypeVM.deleteType(typeToDelete)
+                } catch let details as ErrorDetails {
+                    alertManager.showAlert(.error(details: details))
+                } catch {
+                    alertManager.showAlert(.simple(
+                        title: "Unexpected error:",
+                        message: error.localizedDescription))
+                }
             }
         ))
     }
 }
-
-//#Preview {
-//    Types()
-//}

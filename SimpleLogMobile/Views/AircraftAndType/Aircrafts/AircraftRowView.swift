@@ -22,7 +22,15 @@ struct AircraftRowView: View {
                     .lineLimit(1)
                     .font(.title2)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                Text(aircraft.getType.name.strUnwrap)
+                HStack {
+                    Text(aircraft.isSimulator ? "<Simulator>" : "")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text("Type: \(aircraft.getType.designator.strUnwrap)")
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text("MTOW: \(aircraft.mtowString)")
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                }
+                
             }
             .frame(maxWidth: .infinity)
             .clipped()

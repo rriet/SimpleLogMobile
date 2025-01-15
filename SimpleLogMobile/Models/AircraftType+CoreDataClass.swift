@@ -37,10 +37,19 @@ public class AircraftType: NSManagedObject, SwipeableItem {
     
     var category: AircraftCategory {
         get {
-            AircraftCategory(rawValue: categoryString ?? "Landplane") ?? .Landplane
+            AircraftCategory(rawValue: categoryString.strUnwrap) ?? .Landplane
         }
         set {
             categoryString = newValue.rawValue
+        }
+    }
+    
+    var engine: EngineTypes {
+        get {
+            EngineTypes(rawValue: engineTypeString.strUnwrap) ?? .Jet
+        }
+        set {
+            engineTypeString = newValue.rawValue
         }
     }
 }
@@ -61,17 +70,13 @@ enum AircraftCategory: String, Codable, CaseIterable {
 enum EngineTypes: String, Codable, CaseIterable {
     case Rocket = "Rocket"
     case Piston = "Piston"
-    case Turboprop = "Turboprop/Turboshaft"
+    case Turboprop = "Turboprop"
     case Jet = "Jet"
     case Electric = "Electric"
-    case UltraLightAircraft = "Ultra-light Aircraft"
+    case UltraLightAircraft = "Ultra-light"
     case Drone = "Drone"
-    case Helicopter = "Helicopter"
-    case UltraLightGyrocopter = "Micro-/Ultra-light Gyrocopter"
-    case UltraLightHelicopter = "Ultra-light Helicopter"
-    case Glider = "Glider/Sailplane"
+    case Glider = "Glider"
     case Airship = "Airship"
     case Balloon = "Balloon"
-    case ZZZZ = "Aircraft type not yet assigned"
-    case Paraplane = "Powered parachute/Paraplane."
+    case Paraplane = "Paraplane"
 }
