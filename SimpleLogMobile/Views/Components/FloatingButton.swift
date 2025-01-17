@@ -39,7 +39,8 @@ struct FloatingButtonModifier: ViewModifier {
                     .shadow(radius: 4)
                 }
             }
-            .padding([.bottom, .trailing], 30)
+            .padding([.bottom], 15)
+            .padding([.trailing], 30)
         }
     }
 }

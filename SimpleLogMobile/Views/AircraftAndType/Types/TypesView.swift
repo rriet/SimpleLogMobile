@@ -12,40 +12,37 @@ struct TypesView: View {
     
     @EnvironmentObject var aircraftTypeVM: AircraftTypeViewModel
     
+    var groupedTypes: [String: [AircraftType]] {
+        Dictionary(grouping: aircraftTypeVM.typeList, by: { $0.family ?? "" })
+    }
+    
     @State private var selectedType: AircraftType? = nil
     @State private var showAddEdit = false
     @StateObject var alertManager = AlertManager()
     
     var body: some View {
         VStack {
-            if !aircraftTypeVM.groupedTypeArray.isEmpty {
+            if !groupedTypes.isEmpty {
                 List {
-                    ForEach(
-                        aircraftTypeVM.groupedTypeArray.keys.sorted(),
-                        id: \.self
-                    ) { groupName in
-                        Text("Family: \(groupName)")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .listRowBackground(
-                                Color(Color.theme.secondaryBackground)
-                            )
-                        ForEach(aircraftTypeVM.groupedTypeArray[groupName] ?? [], id: \.self) { aircraftType in
-                            TypeRowView(
-                                aircraftType: aircraftType,
-                                onDelete: {
-                                    deleteType(aircraftType)
-                                },
-                                onEdit: {
-                                    editType(aircraftType)
-                                },
-                                onTapGesture: {
-                                    
-                                },
-                                onToggleLock: {
-                                    try! aircraftTypeVM.toggleLocked(aircraftType)
-                                }
-                            )
+                    ForEach(groupedTypes.keys.sorted(), id: \.self) { groupName in
+                        Section(header: Text("Family: \(groupName)")){
+                            ForEach(groupedTypes[groupName] ?? [], id: \.self) { aircraftType in
+                                TypeRowView(
+                                    aircraftType: aircraftType,
+                                    onDelete: {
+                                        deleteType(aircraftType)
+                                    },
+                                    onEdit: {
+                                        editType(aircraftType)
+                                    },
+                                    onTapGesture: {
+                                        
+                                    },
+                                    onToggleLock: {
+                                        try! aircraftTypeVM.toggleLocked(aircraftType)
+                                    }
+                                )
+                            }
                         }
                     }
                     // Spacer to allow last entry to scroll pass the + button
@@ -82,7 +79,6 @@ struct TypesView: View {
             ),
             action: {
                 newType()
-//                aircraftTypeVM.addRandomTypes()
             }
         )
         
@@ -91,6 +87,16 @@ struct TypesView: View {
         .sheet(isPresented: $showAddEdit) {
             AddEditTypeView($selectedType)
                 .interactiveDismissDisabled()
+        }
+    }
+    
+    private func refreshList(){
+        do {
+            try aircraftTypeVM.fetchTypeData()
+        } catch {
+            alertManager.showAlert(.simple(
+                title: "Unexpected error:",
+                message: error.localizedDescription))
         }
     }
     

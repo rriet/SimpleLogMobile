@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24C101" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
-    <entity name="Aircraft" representedClassName="Aircraft" isAbstract="YES" syncable="YES" codeGenerationType="category">
+    <entity name="Aircraft" representedClassName="Aircraft" syncable="YES" codeGenerationType="category">
         <attribute name="aircraftMtow" optional="YES" attributeType="Integer 64" usesScalarValueType="YES"/>
         <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isSimulator" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="registration" attributeType="String"/>
         <relationship name="aircraftType" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AircraftType" inverseName="aircrafts" inverseEntity="AircraftType"/>
+        <relationship name="flights" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="aircraft" inverseEntity="Flight"/>
+        <relationship name="simTrainings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SimulatorTraining" inverseName="aircraft" inverseEntity="SimulatorTraining"/>
     </entity>
     <entity name="AircraftType" representedClassName="AircraftType" syncable="YES" codeGenerationType="category">
         <attribute name="categoryString" attributeType="String" defaultValueString="Landplane"/>
@@ -21,5 +23,49 @@
         <attribute name="multiEngine" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <attribute name="multiPilot" attributeType="Boolean" defaultValueString="YES" usesScalarValueType="YES"/>
         <relationship name="aircrafts" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="aircraftType" inverseEntity="Aircraft"/>
+    </entity>
+    <entity name="Airport" representedClassName="Airport" syncable="YES" codeGenerationType="class">
+        <attribute name="city" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="country" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="iata" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="icao" attributeType="String" defaultValueString=""/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="name" optional="YES" attributeType="String" defaultValueString=""/>
+        <relationship name="flightsArriving" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="arrAirport" inverseEntity="Flight"/>
+        <relationship name="flightsDeparting" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="depAirport" inverseEntity="Flight"/>
+    </entity>
+    <entity name="Crew" representedClassName="Crew" syncable="YES" codeGenerationType="class">
+        <attribute name="email" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="name" attributeType="String" defaultValueString=""/>
+        <attribute name="notes" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="phone" optional="YES" attributeType="String" defaultValueString=""/>
+        <relationship name="flights" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="crewMembers" inverseEntity="Flight"/>
+    </entity>
+    <entity name="DutyPeriod" representedClassName="DutyPeriod" syncable="YES" codeGenerationType="class">
+        <relationship name="dutyEnd" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="dutyEnd" inverseEntity="Timeline"/>
+        <relationship name="dutyStart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="dutyStart" inverseEntity="Timeline"/>
+    </entity>
+    <entity name="Flight" representedClassName="Flight" syncable="YES" codeGenerationType="category">
+        <attribute name="blockTime" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="endTime" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="aircraft" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="flights" inverseEntity="Aircraft"/>
+        <relationship name="arrAirport" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsArriving" inverseEntity="Airport"/>
+        <relationship name="crewMembers" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Crew" inverseName="flights" inverseEntity="Crew"/>
+        <relationship name="depAirport" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsDeparting" inverseEntity="Airport"/>
+        <relationship name="startTimeline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="flightStart" inverseEntity="Timeline"/>
+    </entity>
+    <entity name="Positioning" representedClassName="Positioning" syncable="YES" codeGenerationType="class"/>
+    <entity name="PreviousExperience" representedClassName="PreviousExperience" syncable="YES" codeGenerationType="class"/>
+    <entity name="SimulatorTraining" representedClassName="SimulatorTraining" syncable="YES" codeGenerationType="category">
+        <relationship name="aircraft" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="simTrainings" inverseEntity="Aircraft"/>
+        <relationship name="startTimeline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="simulatorStart" inverseEntity="Timeline"/>
+    </entity>
+    <entity name="Timeline" representedClassName="Timeline" syncable="YES" codeGenerationType="class">
+        <attribute name="dateValue" attributeType="Date" usesScalarValueType="NO"/>
+        <relationship name="dutyEnd" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DutyPeriod" inverseName="dutyEnd" inverseEntity="DutyPeriod"/>
+        <relationship name="dutyStart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DutyPeriod" inverseName="dutyStart" inverseEntity="DutyPeriod"/>
+        <relationship name="flightStart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Flight" inverseName="startTimeline" inverseEntity="Flight"/>
+        <relationship name="simulatorStart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SimulatorTraining" inverseName="startTimeline" inverseEntity="SimulatorTraining"/>
     </entity>
 </model>

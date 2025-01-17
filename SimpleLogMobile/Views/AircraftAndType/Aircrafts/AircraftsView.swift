@@ -13,21 +13,12 @@ struct AircraftsView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
     @EnvironmentObject var aircraftTypeVM: AircraftTypeViewModel
+    @ObservedObject private var aircraftVM = AircraftViewModel()
     
-    @FetchRequest(
-        sortDescriptors: [
-            NSSortDescriptor(keyPath: \Aircraft.aircraftType?.designator, ascending: true),
-            NSSortDescriptor(keyPath: \Aircraft.registration, ascending: true)
-        ],
-        animation: .default
-    )
-    private var aircraftList: FetchedResults<Aircraft>
-    
-    var groups: [String: [Aircraft]] {
+    var groupedAircrafts: [String: [Aircraft]] {
         Dictionary(
-            grouping: aircraftList,
-            by: { $0.getType.designator.strUnwrap }
-        )
+            grouping: aircraftVM.aircraftList,
+            by: {$0.aircraftType?.designatorUnwrapped ?? ""})
     }
     
     @State private var selectedAircraft: Aircraft?
@@ -36,40 +27,30 @@ struct AircraftsView: View {
     
     var body: some View {
         VStack {
-            if !groups.isEmpty {
+            if !groupedAircrafts.isEmpty {
                 List {
-                    ForEach(groups.keys.sorted(), id: \.self) { groupName in
-                        Text("Type: \(groupName)")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .listRowBackground(
-                                Color(Color.theme.secondaryBackground)
-                            )
-                        ForEach(groups[groupName] ?? [], id: \.self) { aircraft in
-                            AircraftRowView(
-                                aircraft: aircraft,
-                                onDelete: {
-                                    viewContext.delete(aircraft)
-                                    do {
-                                        try viewContext.save()
-                                        try aircraftTypeVM.fetchTypeData()
-                                    } catch {
-                                        print("Failed to delete aircraft: \(error.localizedDescription)")
-                                    }
-                                },
-                                onEdit: {
-                                    
-                                },
-                                onTapGesture: {
-                                    
-                                },
-                                onToggleLock: {
-                                    
-                                })
+                    ForEach(groupedAircrafts.keys.sorted(), id: \.self) { groupName in
+                        Section(header: Text("Type: \(groupName)")){
+                            ForEach(groupedAircrafts[groupName] ?? [], id: \.self) { aircraft in
+                                AircraftRowView(
+                                    aircraft: aircraft,
+                                    onDelete: {
+                                        deleteAircraft(aircraft)
+                                    },
+                                    onEdit: {
+                                        editAircraft(aircraft)
+                                    },
+                                    onTapGesture: {
+                                        
+                                    },
+                                    onToggleLock: {
+                                        try! aircraftVM.toggleLocked(aircraft)
+                                    })
+                            }
                         }
                     }
                 }
-                .listSectionSpacing(7)
+                .listSectionSpacing(5)
             } else {
                 Text("No Aircraft to display.\nPress the \"Plus\" button to create a new Aircraft.")
                     .font(.subheadline)
@@ -81,6 +62,9 @@ struct AircraftsView: View {
                     )
                     .background(Color.theme.secondaryBackground)
             }
+        }
+        .alert(item: $alertManager.currentAlert) { alertInfo in
+            alertManager.getAlert(alertInfo)
         }
         // Hides the background of the list, so the color propagates from the back
         .scrollContentBackground(.hidden)
@@ -98,8 +82,58 @@ struct AircraftsView: View {
         // Edit Screen
         // sheet works on all systems, but is dismissible on IOS, not dismissible on MacOS
         .sheet(isPresented: $showAddEdit) {
-            // TODO:
+            AddEditAircraftView($selectedAircraft)
+                .interactiveDismissDisabled()
         }
+    }
+    
+    private func deleteAircraft(_ aircraftToDelete: Aircraft) {
+        
+        print(aircraftToDelete.hasFlights)
+        
+        // Verify if type has associated flight
+        if aircraftToDelete.hasFlights {
+            alertManager.showAlert(.simple(
+                title: "Cannot Delete Aircraft",
+                message: "The selected Aircraft cannot be deleted because it is associated with one or more flights."))
+            return
+        }
+        
+        // Verify if type has associated simulator
+        if aircraftToDelete.hasSimTrainingArray {
+            alertManager.showAlert(.simple(
+                title: "Cannot Delete Aircraft",
+                message: "The selected Aircraft cannot be deleted because it is associated with one or more Simulator Trining."))
+            return
+        }
+        
+        alertManager.showAlert(.confirmation(
+            title: "Delete Aircraft",
+            message: "Are you sure you want to delete this Aircraft?",
+            confirmAction: {
+                do {
+                    try aircraftVM.deleteAircraft(aircraftToDelete)
+                    try aircraftVM.fetchAircraftData()
+                    try aircraftTypeVM.fetchTypeData()
+                } catch let details as ErrorDetails {
+                    alertManager.showAlert(.error(details: details))
+                } catch {
+                    alertManager.showAlert(.simple(
+                        title: "Unexpected error:",
+                        message: error.localizedDescription))
+                }
+            }
+        ))
+    }
+    
+    private func newAircraft() {
+        self.selectedAircraft = nil
+        showAddEdit.toggle()
+    }
+    
+    private func editAircraft(_ selectedAircraft: Aircraft) {
+        self.selectedAircraft = selectedAircraft
+        showAddEdit.toggle()
     }
     
 }

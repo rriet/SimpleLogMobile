@@ -34,11 +34,14 @@ struct AddEditTypeView: View {
     // Binding to the type being edited (if any)
     @Binding var typeToEdit: AircraftType?
     
+    @State private var families: [String] = []
+    
     // StateObject to manage alert presentation
     @StateObject var alertManager = AlertManager()
+    @State private var showFamilyPicker: Bool = false
     
     // Custom initializer to pass the typeToEdit binding
-    init(_ aircraftType: Binding<AircraftType?>) {
+    init(_ aircraftType: Binding<AircraftType?>, onTypeAdded: ((AircraftType) -> Void)? = nil) {
         self._typeToEdit = aircraftType
     }
     
@@ -58,21 +61,45 @@ struct AddEditTypeView: View {
                     }
                 )
                 
-                InputField(
-                    "Family",
-                    textValue: $family,
-                    capitalization: .sentences
-                )
+                HStack{
+                    InputField(
+                        "Family",
+                        textValue: $family,
+                        capitalization: .sentences
+                    )
+                    Button {
+                        showFamilyPicker.toggle()
+                    } label: {
+                        Image(systemName: "chevron.down") // Use an Image
+                            .font(.system(size: 20, weight: .bold))
+                            .frame(width: 44, height: 20)
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(families.isEmpty)
+                    .popover(
+                        isPresented: $showFamilyPicker,
+                        content: {
+                            VStack(spacing: 16) {
+                                Picker("Families", selection: $family) {
+                                    Text("Select One").tag("")
+                                    ForEach(families, id: \.self) { familyName in
+                                        Text(familyName).tag(familyName)
+                                    }
+                                }
+                                .pickerStyle(.wheel)
+                            }
+                            .frame(width: 300, height: 200) // Optional: Set a fixed size for the popover
+                        }
+                    )
+                    .presentationCompactAdaptation(.popover)
+                }
+                
                 
                 InputField(
                     "Maker",
                     textValue: $maker,
                     capitalization: .sentences
                 )
-                
-                // TextField for Maximum Take-Off Weight (MTOW)
-                TextField("MTOW", text: $mtow)
-                    .keyboardType(.numberPad) // Ensure numeric input
                 
                 NumericField(
                     "MTOW",
@@ -97,11 +124,11 @@ struct AddEditTypeView: View {
                 }
                 
                 // Toggles for various aircraft properties
-                Toggle("Multi-Engine", isOn: $multiEngine)
-                Toggle("Multi-Pilot", isOn: $multiPilot)
                 Toggle("EFIS", isOn: $efis)
                 Toggle("Complex", isOn: $complex)
                 Toggle("High Performance", isOn: $highPerformance)
+                Toggle("Multi-Pilot", isOn: $multiPilot)
+                Toggle("Multi-Engine", isOn: $multiEngine)
             }
             .navigationTitle(typeToEdit == nil ? "Add Aircraft Type" : "Edit Aircraft Type") // Dynamic title
             .navigationBarTitleDisplayMode(.inline)
@@ -125,6 +152,7 @@ struct AddEditTypeView: View {
         .alert(item: $alertManager.currentAlert) { alertInfo in
             alertManager.getAlert(alertInfo) // Show alerts for errors or confirmations
         }
+        
     }
     
     private func checkExists(_ input: String) -> InputField.ErrorType?  {
@@ -149,6 +177,10 @@ struct AddEditTypeView: View {
     
     // Initialize form fields with the values of the type being edited
     private func initializeFields() {
+        
+        // Load existing Type Families
+        try? families = aircraftTypeVM.fetchFamilyList()
+        
         guard let receivedType = typeToEdit else { return }
         
         // Populate fields with existing data
@@ -170,7 +202,7 @@ struct AddEditTypeView: View {
         do {
             if typeToEdit == nil {
                 // Adding a new aircraft type
-                try aircraftTypeVM.addType(
+                let newType = try aircraftTypeVM.addType(
                     designator: designator,
                     family: family,
                     maker: maker,
@@ -183,6 +215,7 @@ struct AddEditTypeView: View {
                     complex: complex,
                     highPerformance: highPerformance
                 )
+                typeToEdit = newType
             } else {
                 // Editing an existing aircraft type
                 try aircraftTypeVM.editType(
@@ -212,7 +245,7 @@ struct AddEditTypeView: View {
             ))
             return
         }
-        
-        dismiss() // Dismiss the view after a successful save
+        // Dismiss the view after a successful save
+        dismiss()
     }
 }

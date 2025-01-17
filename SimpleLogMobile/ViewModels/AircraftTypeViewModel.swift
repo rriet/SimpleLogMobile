@@ -11,22 +11,28 @@ import CoreData
 class AircraftTypeViewModel: ObservableObject {
     
     private let viewContext = PersistenceController.shared.viewContext
-    @Published var groupedTypeArray: [String: [AircraftType]] = [:]
+    @Published var typeList: [AircraftType] = []
     
     init() {
-        try! fetchTypeData()
+        try? fetchTypeData()
     }
     
-    func fetchTypeData() throws {
-        let request = AircraftType.fetchRequest()
-        let sort = NSSortDescriptor(key: "designator", ascending: true)
-        request.sortDescriptors = [sort]
+    func fetchFamilyList() throws -> [String] {
+        // Create a fetch request for AircraftType
+        let request = NSFetchRequest<NSFetchRequestResult>(entityName: "AircraftType")
+        request.resultType = .dictionaryResultType
+        request.returnsDistinctResults = true
+        request.propertiesToFetch = ["family"]
         
         do {
-            let typeArray = try viewContext.fetch(request)
-            groupedTypeArray = Dictionary(
-                    grouping: typeArray,
-                    by: { $0.family ?? "" })
+            // Fetch the results as an array of NSDictionary
+            let results = try viewContext.fetch(request) as? [NSDictionary]
+            
+            // Extract the "family" property values
+            let families = results?.compactMap { $0["family"] as? String } ?? []
+            
+            // Return the unique families (ensured by returnsDistinctResults)
+            return families
         }catch {
             throw ErrorDetails(
                 title: "Error!",
@@ -34,10 +40,28 @@ class AircraftTypeViewModel: ObservableObject {
         }
     }
     
+    func fetchTypeList() throws -> [AircraftType] {
+        let request = AircraftType.fetchRequest()
+        let sort = NSSortDescriptor(key: "designator", ascending: true)
+        request.sortDescriptors = [sort]
+        
+        do {
+            return try viewContext.fetch(request)
+        }catch {
+            throw ErrorDetails(
+                title: "Error!",
+                message: "Unknown error fetching aircraft types.")
+        }
+    }
+    
+    func fetchTypeData() throws {
+        typeList = try fetchTypeList()
+    }
+    
     func addType(
-        designator: String?,
-        family: String?,
-        maker: String?,
+        designator: String,
+        family: String,
+        maker: String = "",
         aircraftCategory: AircraftCategory = .Landplane,
         engineType: EngineTypes = .Jet,
         mtow: String = "0",
@@ -45,12 +69,13 @@ class AircraftTypeViewModel: ObservableObject {
         multiPilot: Bool = true,
         efis: Bool = true,
         complex: Bool = true,
-        highPerformance: Bool = true
-    ) throws {
+        highPerformance: Bool = true,
+        isLocked: Bool = false
+    ) throws -> AircraftType {
         
         try checkTypeDesignator(designator)
         
-        if try checkExist(designator ?? "") {
+        if try checkExist(designator) {
             throw ErrorDetails(
                 title: "Duplicated Type",
                 message: "This Aircraft Type already exists.")
@@ -70,15 +95,18 @@ class AircraftTypeViewModel: ObservableObject {
             multiPilot: multiPilot,
             efis: efis,
             complex: complex,
-            highPerformance: highPerformance
+            highPerformance: highPerformance,
+            isLocked: isLocked
         )
+        
+        return newType
     }
     
     func editType(
         typeToEdit: AircraftType,
-        designator: String?,
-        family: String?,
-        maker: String?,
+        designator: String,
+        family: String,
+        maker: String = "",
         aircraftCategory: AircraftCategory = .Landplane,
         engineType: EngineTypes = .Jet,
         mtow: String = "0",
@@ -86,21 +114,15 @@ class AircraftTypeViewModel: ObservableObject {
         multiPilot: Bool = true,
         efis: Bool = true,
         complex: Bool = true,
-        highPerformance: Bool = true
+        highPerformance: Bool = true,
+        isLocked: Bool = false
     ) throws {
         
         try checkTypeDesignator(designator)
         
-        var familyUnwrap: String
-        if family == nil || family?.count ?? 0 < 3 {
-            familyUnwrap = designator ?? ""
-        } else {
-            familyUnwrap = family.strUnwrap
-        }
-        
-        typeToEdit.designator = designator?.uppercased()
-        typeToEdit.family = familyUnwrap
-        typeToEdit.maker = maker
+        typeToEdit.designator = designator.uppercased().trimmingCharacters(in: .whitespaces)
+        typeToEdit.family = (family.count > 0) ? family.trimmingCharacters(in: .whitespaces) : designator.trimmingCharacters(in: .whitespaces)
+        typeToEdit.maker = maker.trimmingCharacters(in: .whitespaces)
         typeToEdit.category = aircraftCategory
         typeToEdit.engine = engineType
         typeToEdit.mtow = Int64(mtow) ?? 0
@@ -109,6 +131,7 @@ class AircraftTypeViewModel: ObservableObject {
         typeToEdit.efis = efis
         typeToEdit.complex = complex
         typeToEdit.highPerformance = highPerformance
+        typeToEdit.isLocked = isLocked
         
         try save()
     }
@@ -128,14 +151,8 @@ class AircraftTypeViewModel: ObservableObject {
         }   
     }
     
-    func checkTypeDesignator (_ designatorString: String?) throws {
-        guard let desig = designatorString else {
-            throw ErrorDetails(
-                title: "Invalid Type",
-                message: "Type designator is required.")
-        }
-        
-        if desig.count < 3 {
+    func checkTypeDesignator (_ designator: String) throws {
+        if designator.count < 3 {
             throw ErrorDetails(
                 title: "Invalid Type",
                 message: "Type designator must be at least 3 characters long.")

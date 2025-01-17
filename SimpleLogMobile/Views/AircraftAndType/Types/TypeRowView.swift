@@ -17,12 +17,13 @@ struct TypeRowView: View {
     let onToggleLock: () -> Void
     
     var body: some View {
-        Section(){
-            HStack(alignment: .top) {
-                Text(aircraftType.designator.strUnwrap)
-                    .lineLimit(1)
-                    .font(.title2)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+        HStack(alignment: .top) {
+            Text(aircraftType.designator.strUnwrap)
+                .lineLimit(1)
+                .font(.title3)
+                .frame(idealWidth: 100, maxWidth: .infinity, alignment: .leading)
+            
+            ViewThatFits {
                 VStack(alignment: .leading) {
                     Text("Maker: \(aircraftType.maker.strUnwrap)")
                         .lineLimit(1)
@@ -33,44 +34,55 @@ struct TypeRowView: View {
                     Text("MTOW: \(aircraftType.mtow)")
                         .lineLimit(1)
                 }
-                .font(.subheadline)
-                .frame(maxWidth: .infinity, alignment: .leading)
                 VStack(alignment: .leading) {
-                    Text("EFIS")
-                        .foregroundStyle(
-                            aircraftType.efis ? .blue : Color.theme.inactive
-                        )
-                    Text("Complex")
-                        .foregroundStyle(
-                            aircraftType.complex ? .blue : Color.theme.inactive
-                        )
-                    Text("HighPerf")
-                        .foregroundStyle(
-                            aircraftType.highPerformance ? .blue : Color.theme.inactive
-                        )
-                    Text("MultiPilot")
-                        .foregroundStyle(
-                            aircraftType.multiPilot ? .blue : Color.theme.inactive
-                        )
-                    Text("MultiEngine")
-                        .foregroundStyle(
-                            aircraftType.multiEngine ? .blue : Color.theme.inactive
-                        )
+                    Text("\(aircraftType.maker.strUnwrap)")
+                        .lineLimit(1)
+                    Text("\(aircraftType.engine)")
+                        .lineLimit(1)
+                    Text("\(aircraftType.category)")
+                        .lineLimit(1)
+                    Text("\(aircraftType.mtow)")
+                        .lineLimit(1)
                 }
-                .font(.subheadline)
             }
-            .frame(maxWidth: .infinity)
-            .clipped()
-            .listRowBackground(Color.theme.background)
-            .swipeActions(allowsFullSwipe: false) {
-                SwipeActionsView<AircraftType>(
-                    item: aircraftType,
-                    onDelete: onDelete,
-                    onEdit: onEdit,
-                    onToggleLock: onToggleLock
-                )
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .font(.caption)
+            
+            VStack(alignment: .leading) {
+                Text("EFIS")
+                    .foregroundStyle(
+                        aircraftType.efis ? .blue : Color.theme.inactive
+                    )
+                Text("Complex")
+                    .foregroundStyle(
+                        aircraftType.complex ? .blue : Color.theme.inactive
+                    )
+                Text("HighPerf")
+                    .foregroundStyle(
+                        aircraftType.highPerformance ? .blue : Color.theme.inactive
+                    )
+                Text("MultiPilot")
+                    .foregroundStyle(
+                        aircraftType.multiPilot ? .blue : Color.theme.inactive
+                    )
+                Text("MultiEngine")
+                    .foregroundStyle(
+                        aircraftType.multiEngine ? .blue : Color.theme.inactive
+                    )
             }
-            .onTapGesture {onTapGesture()}
+            .font(.caption)
         }
+        .frame(maxWidth: .infinity)
+        .clipped()
+        .listRowBackground(Color.theme.background)
+        .swipeActions(allowsFullSwipe: false) {
+            SwipeActionsView<AircraftType>(
+                item: aircraftType,
+                onDelete: onDelete,
+                onEdit: onEdit,
+                onToggleLock: onToggleLock
+            )
+        }
+        .onTapGesture {onTapGesture()}
     }
 }

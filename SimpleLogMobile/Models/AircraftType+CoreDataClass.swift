@@ -24,9 +24,11 @@ public class AircraftType: NSManagedObject, SwipeableItem {
     
     var aircraftsArray: [Aircraft] {
         let acfts = self.aircrafts as? Set<Aircraft> ?? []
-        return acfts.sorted {
-            $0.registration ?? "" < $1.registration ?? ""
-        }
+        return acfts.sorted()
+    }
+    
+    var designatorUnwrapped: String {
+        return self.designator.strUnwrap
     }
     
     /// Returns a list of `AircraftModel` instances associated with this aircraft type.

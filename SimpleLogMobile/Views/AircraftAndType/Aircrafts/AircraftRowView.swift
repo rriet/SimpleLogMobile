@@ -16,34 +16,32 @@ struct AircraftRowView: View {
     let onToggleLock: () -> Void
     
     var body: some View {
-        Section(){
-            VStack(alignment: .leading) {
-                Text(aircraft.registration.strUnwrap)
-                    .lineLimit(1)
-                    .font(.title2)
+        VStack(alignment: .leading) {
+            Text(aircraft.registration.strUnwrap)
+                .lineLimit(1)
+                .font(.title2)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            HStack {
+                Text(aircraft.isSimulator ? "<Simulator>" : "")
                     .frame(maxWidth: .infinity, alignment: .leading)
-                HStack {
-                    Text(aircraft.isSimulator ? "<Simulator>" : "")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Text("Type: \(aircraft.getType.designator.strUnwrap)")
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    Text("MTOW: \(aircraft.mtowString)")
-                        .frame(maxWidth: .infinity, alignment: .trailing)
-                }
-                
+                Text("Type: \(aircraft.aircraftType?.designator ?? "")")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text("MTOW: \(aircraft.mtowString)")
+                    .frame(maxWidth: .infinity, alignment: .trailing)
             }
-            .frame(maxWidth: .infinity)
-            .clipped()
-            .listRowBackground(Color.theme.background)
-            .swipeActions(allowsFullSwipe: false) {
-                SwipeActionsView<Aircraft>(
-                    item: aircraft,
-                    onDelete: onDelete,
-                    onEdit: onEdit,
-                    onToggleLock: onToggleLock
-                )
-            }
-            .onTapGesture {onTapGesture()}
+            
         }
+        .frame(maxWidth: .infinity)
+        .clipped()
+        .listRowBackground(Color.theme.background)
+        .swipeActions(allowsFullSwipe: false) {
+            SwipeActionsView<Aircraft>(
+                item: aircraft,
+                onDelete: onDelete,
+                onEdit: onEdit,
+                onToggleLock: onToggleLock
+            )
+        }
+        .onTapGesture {onTapGesture()}
     }
 }
