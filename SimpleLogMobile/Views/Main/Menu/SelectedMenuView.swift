@@ -23,8 +23,7 @@ struct SelectedMenuView: View {
                 Text("Apt")
 //                AirportsView()
             case .CrewView:
-                Text("Crew")
-//                CrewView()
+                CrewsView()
             case .SummaryView:
                 Text("Summary")
 //                SummaryView()

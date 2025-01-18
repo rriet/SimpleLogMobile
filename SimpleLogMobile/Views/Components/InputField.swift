@@ -15,6 +15,7 @@ struct InputField: View {
     private let isRequired: Bool
     private let minLength: Int?
     private let maxLength: Int?
+    private let lines: Int
     private let inputType: InputType
     private let capitalization: TextInputAutocapitalization
     
@@ -47,6 +48,7 @@ struct InputField: View {
     ///   - isRequired: A boolean indicating if the field is required.
     ///   - minLength: The minimum allowed length of the input.
     ///   - maxLength: The maximum allowed length of the input.
+    ///   - lines: The number of lines of the input.
     ///   - inputType: The type of input to validate.
     ///   - capitalization: The capitalization style for the text input.
     ///   - customValidation: Optional custom validation function (returns InputField.ErrorType? )
@@ -57,6 +59,7 @@ struct InputField: View {
         isRequired: Bool = false,
         minLength: Int? = nil,
         maxLength: Int? = nil,
+        lines: Int = 1,
         inputType: InputType = .any,
         capitalization: TextInputAutocapitalization = .never,
         customValidation: ((String) -> ErrorType?)? = nil
@@ -67,6 +70,7 @@ struct InputField: View {
         self.isRequired = isRequired
         self.minLength = minLength
         self.maxLength = maxLength
+        self.lines = lines
         self.inputType = inputType
         self.capitalization = capitalization
         self.validation = customValidation
@@ -79,7 +83,10 @@ struct InputField: View {
                     .foregroundColor(.secondary)
                 
                 VStack (alignment: .leading){
-                    TextField(isRequired ? "Required" : "", text: $text)
+                    TextField(
+                        isRequired ? "Required" : "",
+                        text: $text,
+                        axis: lines > 1 ? .vertical : .horizontal)
 #if os(iOS)
                         .keyboardType(keyboardType)
 #endif
@@ -89,7 +96,7 @@ struct InputField: View {
                         .textInputAutocapitalization(capitalization)
                         .onChange(of: text, validateInput)
                         .onAppear(perform: validateInput)
-                    
+                        .lineLimit(lines...lines)
                     if let errorCode = errorCode {
                         Text(errorDescription(for: errorCode))
                             .font(.caption)
@@ -143,7 +150,7 @@ struct InputField: View {
                 regex = ""
         }
         
-        if !regex.isEmpty {
+        if !regex.isEmpty && !trimmedInput.isEmpty {
             guard trimmedInput.range(of: regex, options: .regularExpression) != nil else {
                 errorCode = .invalidFormat(regexError)
                 isInvalid = true

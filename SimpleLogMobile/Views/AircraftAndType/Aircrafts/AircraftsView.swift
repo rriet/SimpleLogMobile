@@ -10,8 +10,6 @@ import CoreData
 
 struct AircraftsView: View {
     
-    @Environment(\.managedObjectContext) private var viewContext
-    
     @EnvironmentObject var aircraftTypeVM: AircraftTypeViewModel
     @ObservedObject private var aircraftVM = AircraftViewModel()
     
@@ -74,10 +72,7 @@ struct AircraftsView: View {
                     .foregroundColor(.white)
                     .font(.title)
             ),
-            action: {
-                showAddEdit.toggle()
-            }
-        )
+            action: newAircraft)
         
         // Edit Screen
         // sheet works on all systems, but is dismissible on IOS, not dismissible on MacOS
@@ -88,8 +83,6 @@ struct AircraftsView: View {
     }
     
     private func deleteAircraft(_ aircraftToDelete: Aircraft) {
-        
-        print(aircraftToDelete.hasFlights)
         
         // Verify if type has associated flight
         if aircraftToDelete.hasFlights {
@@ -113,8 +106,8 @@ struct AircraftsView: View {
             confirmAction: {
                 do {
                     try aircraftVM.deleteAircraft(aircraftToDelete)
-                    try aircraftVM.fetchAircraftData()
-                    try aircraftTypeVM.fetchTypeData()
+                    try aircraftVM.fetchAircraftList()
+                    try aircraftTypeVM.fetchTypeList()
                 } catch let details as ErrorDetails {
                     alertManager.showAlert(.error(details: details))
                 } catch {

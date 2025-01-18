@@ -16,6 +16,10 @@ struct AddEditTypeView: View {
     // EnvironmentObject for accessing the shared AircraftTypeViewModel
     @EnvironmentObject var aircraftTypeVM: AircraftTypeViewModel
     
+    // Binding to the type being edited (if any)
+    @Binding var typeToEdit: AircraftType?
+    @State private var families: [String] = []
+    
     // State variables to bind form inputs and track validation states
     @State private var designator: String = ""
     @State private var isDesignatorInvalid: Bool = false
@@ -30,11 +34,6 @@ struct AddEditTypeView: View {
     @State private var efis: Bool = true
     @State private var complex: Bool = true
     @State private var highPerformance: Bool = true
-    
-    // Binding to the type being edited (if any)
-    @Binding var typeToEdit: AircraftType?
-    
-    @State private var families: [String] = []
     
     // StateObject to manage alert presentation
     @StateObject var alertManager = AlertManager()

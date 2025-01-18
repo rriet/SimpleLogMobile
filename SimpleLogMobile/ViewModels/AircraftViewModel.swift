@@ -11,29 +11,24 @@ import CoreData
 class AircraftViewModel: ObservableObject {
     
     private let viewContext = PersistenceController.shared.viewContext
-//    @Published var groupedAircraftArray: [String: [Aircraft]] = [:]
     @Published var aircraftList: [Aircraft] = []
     
     init() {
-        try? fetchAircraftData()
+        try? fetchAircraftList()
     }
     
-    func fetchAircraftList() throws -> [Aircraft] {
+    func fetchAircraftList() throws {
         let request = Aircraft.fetchRequest()
         let sort = NSSortDescriptor(key: "registration", ascending: true)
         request.sortDescriptors = [sort]
         
         do {
-            return try viewContext.fetch(request)
+            aircraftList = try viewContext.fetch(request)
         }catch {
             throw ErrorDetails(
                 title: "Error!",
                 message: "Unknown error fetching aircrafts.")
         }
-    }
-    
-    func fetchAircraftData() throws {
-        aircraftList = try fetchAircraftList()
     }
     
     func addAircraft(
@@ -131,6 +126,6 @@ class AircraftViewModel: ObservableObject {
                 title: "Error!",
                 message: "There was an unknown error saving to database.")
         }
-        try fetchAircraftData()
+        try fetchAircraftList()
     }
 }

@@ -76,11 +76,7 @@ struct TypesView: View {
                 Image(systemName: "plus")
                     .foregroundColor(.white)
                     .font(.title)
-            ),
-            action: {
-                newType()
-            }
-        )
+            ), action: newType)
         
         // Edit Screen
         // sheet works on all systems, but is dismissible on IOS, not dismissible on MacOS
@@ -92,7 +88,7 @@ struct TypesView: View {
     
     private func refreshList(){
         do {
-            try aircraftTypeVM.fetchTypeData()
+            try aircraftTypeVM.fetchTypeList()
         } catch {
             alertManager.showAlert(.simple(
                 title: "Unexpected error:",

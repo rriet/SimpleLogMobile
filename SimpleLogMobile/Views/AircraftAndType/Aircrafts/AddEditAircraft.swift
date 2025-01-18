@@ -15,6 +15,7 @@ struct AddEditAircraftView: View {
     @EnvironmentObject var aircraftTypeVM: AircraftTypeViewModel
     private var aircraftVM = AircraftViewModel()
     
+    @Binding var aircraftToEdit: Aircraft?
     
     @State private var registration: String = ""
     @State private var isRegistrationInvalid: Bool = false
@@ -22,11 +23,9 @@ struct AddEditAircraftView: View {
     @State private var istMtowInvalid: Bool = false
     @State private var isSimulator: Bool = false
     @State private var selectedType: AircraftType?
+    
+    
     @State private var showAddTypeSheet = false
-    @State private var isLocked = false
-    
-    @Binding var aircraftToEdit: Aircraft?
-    
     @StateObject var alertManager = AlertManager()
     
     init(_ aircraft: Binding<Aircraft?>) {
@@ -163,8 +162,8 @@ struct AddEditAircraftView: View {
                         isLocked: false
                     )
                 }
-                try aircraftVM.fetchAircraftData()
-                try aircraftTypeVM.fetchTypeData()
+                try aircraftVM.fetchAircraftList()
+                try aircraftTypeVM.fetchTypeList()
             } catch let details as ErrorDetails {
                 // Handle specific error details
                 alertManager.showAlert(.error(details: details))

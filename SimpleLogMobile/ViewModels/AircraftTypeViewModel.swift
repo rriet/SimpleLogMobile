@@ -14,7 +14,7 @@ class AircraftTypeViewModel: ObservableObject {
     @Published var typeList: [AircraftType] = []
     
     init() {
-        try? fetchTypeData()
+        try? fetchTypeList()
     }
     
     func fetchFamilyList() throws -> [String] {
@@ -40,22 +40,18 @@ class AircraftTypeViewModel: ObservableObject {
         }
     }
     
-    func fetchTypeList() throws -> [AircraftType] {
+    func fetchTypeList() throws {
         let request = AircraftType.fetchRequest()
         let sort = NSSortDescriptor(key: "designator", ascending: true)
         request.sortDescriptors = [sort]
         
         do {
-            return try viewContext.fetch(request)
+            typeList = try viewContext.fetch(request)
         }catch {
             throw ErrorDetails(
                 title: "Error!",
                 message: "Unknown error fetching aircraft types.")
         }
-    }
-    
-    func fetchTypeData() throws {
-        typeList = try fetchTypeList()
     }
     
     func addType(
@@ -191,7 +187,7 @@ class AircraftTypeViewModel: ObservableObject {
                 title: "Error!",
                 message: "There was an unknown error saving to database.")
         }
-        try fetchTypeData()
+        try fetchTypeList()
     }
     
     func addRandomTypes() {
