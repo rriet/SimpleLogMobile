@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct zoomPictureView: View {
+struct ZoomPictureView: View {
     
     @Environment(\.dismiss) var dismiss
     

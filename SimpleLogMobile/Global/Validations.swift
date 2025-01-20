@@ -13,7 +13,7 @@ import Foundation
 ///   - minValue: An optional minimum value.
 ///   - maxValue: An optional maximum value.
 /// - Throws: A `ValidationError` if the input is invalid.
-func validateInteger(_ integerString: String, minValue: Double? = nil, maxValue: Double? = nil) throws {
+func isInteger(_ integerString: String, minValue: Double? = nil, maxValue: Double? = nil) throws {
     // Attempt to parse the input string as an integer.
     guard let intValue = Int(integerString) else {
         throw ErrorDetails(
@@ -31,7 +31,7 @@ func validateInteger(_ integerString: String, minValue: Double? = nil, maxValue:
 ///   - minValue: An optional minimum value.
 ///   - maxValue: An optional maximum value.
 /// - Throws: A `ValidationError` if the input is invalid.
-func validateDouble(_ doubleString: String, minValue: Double? = nil, maxValue: Double? = nil) throws {
+func isDouble(_ doubleString: String, minValue: Double? = nil, maxValue: Double? = nil) throws {
     // Attempt to parse the input string as a double.
     guard let doubleValue = Double(doubleString) else {
         throw ErrorDetails(
@@ -78,4 +78,32 @@ func numberRange(_ doubleValue: Double, minValue: Double? = nil, maxValue: Doubl
             title: "Error!",
             message: "Input value above max: \(max)")
     }
+}
+
+func normalizePhoneNumber(_ phone: String) -> String? {
+    let allowedCharacters = CharacterSet(charactersIn: "+0123456789")
+    let normalizedPhone = phone.unicodeScalars
+        .filter { allowedCharacters.contains($0) }
+        .map { String($0) }
+        .joined()
+    
+    return isValidPhoneNumber(normalizedPhone) ? normalizedPhone : nil
+}
+
+func isValidPhoneNumber(_ phone: String) -> Bool {
+    // Regular expression for phone number validation
+    // Allow international format and up to 15 digits (standard limit)
+    let phoneRegex = "^[+]?[0-9]{1,15}$"
+    return NSPredicate(format: "SELF MATCHES %@", phoneRegex).evaluate(with: phone)
+}
+
+func normalizeEmail(_ email: String) -> String? {
+    let normalizedEmail = email.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    return isValidEmail(normalizedEmail) ? normalizedEmail : nil
+}
+
+func isValidEmail(_ email: String) -> Bool {
+    // Simplified email regex (RFC 5322 compliant for most cases)
+    let emailRegex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+    return NSPredicate(format: "SELF MATCHES %@", emailRegex).evaluate(with: email)
 }

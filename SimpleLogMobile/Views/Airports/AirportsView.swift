@@ -1,72 +1,67 @@
 //
-//  CrewView.swift
+//  AirportsView.swift
 //  SimpleLogMobile
 //
-//  Created by Ricardo Brito Riet Correa on 1/17/25.
+//  Created by Ricardo Brito Riet Correa on 1/19/25.
 //
 
 import SwiftUI
 import CoreData
 
-struct CrewsView: View {
+struct AirportsView: View {
     
     @Environment(\.managedObjectContext) private var viewContext
     
-    @ObservedObject private var crewVM = CrewViewModel()
+    @ObservedObject private var airportVM = AirportViewModel()
     
     @State private var searchText: String = ""
-    @State private var filteredCrewList: [Crew] = []
+    @State private var filteredAirportList: [Airport] = []
     
-    var groupedFilteredCrewList: [String: [Crew]] {
-        Dictionary(grouping: filteredCrewList) { crew in
-            guard let name = crew.name, !name.isEmpty else { return "" }
-            return String(name.prefix(1)).uppercased()
+    var groupedFilteredAirportList: [String: [Airport]] {
+        Dictionary(grouping: filteredAirportList) { airport in
+            guard let icao = airport.icao, !icao.isEmpty else { return "" }
+            return String(icao.prefix(1)).uppercased()
         }
     }
     
-    @State private var selectedCrew: Crew?
+    @State private var selectedAirport: Airport?
     @State private var showAddEdit = false
-    @State private var showLargeImage = false
     @StateObject var alertManager = AlertManager()
     
     var body: some View {
         VStack {
-            Text("Crew")
+            Text("Airport")
                 .font(.largeTitle)
                 .padding(.vertical, 1)
-            if !crewVM.crewList.isEmpty {
+            if !airportVM.airportList.isEmpty {
                 HStack {
                     Text("Search:")
                     TextField("Search", text: $searchText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .padding(.horizontal)
                         .onChange(of: searchText) { oldValue , newValue in
-                            filterCrewList()
+                            filterAirportList()
                         }
                 }
                 .padding(.horizontal)
-                if !filteredCrewList.isEmpty {
+                if !groupedFilteredAirportList.isEmpty {
                     List {
-                        ForEach(groupedFilteredCrewList.keys.sorted(), id: \.self) { fistLetter in
+                        ForEach(groupedFilteredAirportList.keys.sorted(), id: \.self) { fistLetter in
                             Section(header: Text(fistLetter)) {
-                                ForEach(groupedFilteredCrewList[fistLetter] ?? [], id: \.self) { crew in
-                                    CrewRowView(
-                                        crew: crew,
+                                ForEach(groupedFilteredAirportList[fistLetter] ?? [], id: \.self) { airport in
+                                    AirportRowView(
+                                        airport: airport,
                                         onDelete: {
-                                            deleteCrew(crew)
+                                            deleteAirport(airport)
                                         },
                                         onEdit: {
-                                            editCrew(crew)
+                                            editAirport(airport)
                                         },
                                         onTapGesture: {
                                             
                                         },
                                         onToggleLock: {
-                                            try! crewVM.toggleLocked(crew)
-                                        },
-                                        onImageTapGesture: {
-                                            selectedCrew = crew
-                                            showLargeImage = true
+                                            try! airportVM.toggleLocked(airport)
                                         })
                                 }
                             }
@@ -80,7 +75,7 @@ struct CrewsView: View {
                     }
                     .listSectionSpacing(10)
                 } else {
-                    Text("No Crew matching search parameters.")
+                    Text("No Airport matching search parameters.")
                         .font(.subheadline)
                         .foregroundColor(Color.theme.foreground)
                         .frame(
@@ -91,7 +86,7 @@ struct CrewsView: View {
                         .background(Color.theme.secondaryBackground)
                 }
             } else {
-                Text("No Crew to display.\nPress the \"Plus\" button to create a new Crewmemeber.")
+                Text("No Airport to display.\nPress the \"Plus\" button to create a new Airport.")
                     .font(.subheadline)
                     .foregroundColor(Color.theme.foreground)
                     .frame(
@@ -103,7 +98,7 @@ struct CrewsView: View {
             }
         }
         .onAppear {
-            filterCrewList()
+            filterAirportList()
         }
         .alert(item: $alertManager.currentAlert) { alertInfo in
             alertManager.getAlert(alertInfo)
@@ -115,63 +110,58 @@ struct CrewsView: View {
                 Image(systemName: "plus")
                     .foregroundColor(.white)
                     .font(.title)
-            ), action: newCrew)
+            ), action: newAirport)
         
         // Edit Screen
         // sheet works on all systems, but is dismissible on IOS, not dismissible on MacOS
         .sheet(isPresented: $showAddEdit) {
-            AddEditCrewView($selectedCrew, crewVM: crewVM)
+            AddEditAirportView($selectedAirport, airportVM: airportVM)
                 .interactiveDismissDisabled()
         }
-        .sheet(isPresented: $showLargeImage) {
-            zoomPictureView(crew: $selectedCrew)
-                .presentationDetents([.medium])
-        }
-        
-        
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(Color.theme.secondaryBackground))
+        .onChange(of: airportVM.airportList, filterAirportList)
     }
     
-    private func filterCrewList() {
+    private func filterAirportList() {
         if searchText.isEmpty {
-            filteredCrewList = crewVM.crewList
+            filteredAirportList = airportVM.airportList
         } else {
-            filteredCrewList = crewVM.crewList.filter { crew in
-                crew.name.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
-                crew.phone.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
-                crew.email.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
-                crew.notes.strUnwrap.localizedCaseInsensitiveContains(searchText)
+            filteredAirportList = airportVM.airportList.filter { airport in
+                airport.icao.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
+                airport.iata.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
+                airport.name.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
+                airport.country.strUnwrap
+                    .localizedCaseInsensitiveContains(searchText)
             }
         }
     }
     
-    private func deleteCrew(_ crewToDelete: Crew) {
+    private func deleteAirport(_ airportToDelete: Airport) {
         
         // Verify if type has associated flight
-        if crewToDelete.hasFlights {
+        if airportToDelete.hasFlights {
             alertManager.showAlert(.simple(
-                title: "Cannot Delete Crew",
-                message: "The selected Crewmember cannot be deleted because it is associated with one or more flights."))
+                title: "Cannot Delete Airport",
+                message: "The selected Airport cannot be deleted because it is associated with one or more flights."))
             return
         }
         
-        // Verify if type has associated simulator
-        if crewToDelete.hasSimTrainingArray {
+        // Verify if type has associated positioning
+        if airportToDelete.hasPositioning {
             alertManager.showAlert(.simple(
-                title: "Cannot Delete Crew",
-                message: "The selected Crewmember cannot be deleted because it is associated with one or more Simulator Trining."))
+                title: "Cannot Delete Airport",
+                message: "The selected Airport cannot be deleted because it is associated with one or more Positioning Duty."))
             return
         }
         
         alertManager.showAlert(.confirmation(
-            title: "Delete Crew",
-            message: "Are you sure you want to delete this Crewmember?",
+            title: "Delete Airport",
+            message: "Are you sure you want to delete this Airport?",
             confirmAction: {
                 do {
-                    try crewVM.deleteCrew(crewToDelete)
-                    try crewVM.fetchCrewList()
-                    filterCrewList()
+                    try airportVM.deleteAirport(airportToDelete)
+                    try airportVM.fetchAirportList()
                 } catch let details as ErrorDetails {
                     alertManager.showAlert(.error(details: details))
                 } catch {
@@ -183,13 +173,13 @@ struct CrewsView: View {
         ))
     }
     
-    private func newCrew() {
-        self.selectedCrew = nil
+    private func newAirport() {
+        self.selectedAirport = nil
         showAddEdit.toggle()
     }
     
-    private func editCrew(_ selectedCrew: Crew) {
-        self.selectedCrew = selectedCrew
+    private func editAirport(_ selectedAirport: Airport) {
+        self.selectedAirport = selectedAirport
         showAddEdit.toggle()
     }
 }

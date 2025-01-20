@@ -172,9 +172,9 @@ struct NumericField: View {
         // Perform numeric validation based on the input type
         do {
             if inputType == .integer || inputType == .positiveInteger {
-                try validateInteger(trimmedInput, minValue: minValue, maxValue: maxValue)
+                try isInteger(trimmedInput, minValue: minValue, maxValue: maxValue)
             } else {
-                try validateDouble(trimmedInput, minValue: minValue, maxValue: maxValue)
+                try isDouble(trimmedInput, minValue: minValue, maxValue: maxValue)
             }
         } catch {
             isInvalid = true

@@ -16,21 +16,56 @@ struct AircraftRowView: View {
     let onToggleLock: () -> Void
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(aircraft.registration.strUnwrap)
-                .lineLimit(1)
-                .font(.title2)
-                .frame(maxWidth: .infinity, alignment: .leading)
-            HStack {
-                Text(aircraft.isSimulator ? "<Simulator>" : "")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Text("Type: \(aircraft.aircraftType?.designator ?? "")")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Text("MTOW: \(aircraft.mtowString)")
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+        HStack{
+            VStack (alignment: .trailing) {
+                Text("Registration:")
+                Text("Type:")
+                    .font(.caption)
+                Text("MTOW:")
+                    .font(.caption)
             }
-            
+            VStack (alignment: .leading) {
+                HStack {
+                    Text(aircraft.registration.strUnwrap)
+                        .lineLimit(1)
+                        .font(.headline)
+                        .fontWeight(.bold)
+                    Text(aircraft.isSimulator ? "[Sim]" : "")
+                        .padding(.leading, 10)
+                }
+                Text(aircraft.aircraftType?.designator ?? "")
+                    .lineLimit(1)
+                    .font(.caption)
+                Text("\(aircraft.mtowString)")
+                    .lineLimit(1)
+                    .font(.caption)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
+//        VStack(alignment: .leading) {
+//            HStack{
+//                Text("Registration: ")
+//                Text(aircraft.registration.strUnwrap)
+//                    .font(.headline)
+//                    .fontWeight(.bold)
+//                Text(aircraft.isSimulator ? "[Simulator]" : "")
+//                    .padding(.leading, 10)
+//                    .font(.caption)
+//            }
+//            .lineLimit(1)
+//            .frame(maxWidth: .infinity, alignment: .leading)
+//            Text("Type: \(aircraft.aircraftType?.designator ?? "")")
+//                .lineLimit(1)
+//                .font(.caption)
+//                .frame(maxWidth: .infinity, alignment: .leading)
+//                .padding(.leading, 20)
+//            Text("MTOW: \(aircraft.mtowString)")
+//                .lineLimit(1)
+//                .font(.caption)
+//                .frame(maxWidth: .infinity, alignment: .leading)
+//                .padding(.leading, 20)
+//            
+//        }
         .frame(maxWidth: .infinity)
         .clipped()
         .listRowBackground(Color.theme.background)

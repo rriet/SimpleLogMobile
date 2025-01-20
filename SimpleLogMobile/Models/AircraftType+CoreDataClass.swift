@@ -10,7 +10,11 @@ import Foundation
 import CoreData
 
 @objc(AircraftType)
-public class AircraftType: NSManagedObject, SwipeableItem {
+public class AircraftType: NSManagedObject, SwipeableItem, Comparable {
+    
+    public static func < (lhs: AircraftType, rhs: AircraftType) -> Bool {
+        lhs.designator ?? "" < rhs.designator ?? ""
+    }
     
     var allowDelete: Bool {
         !self.isLocked && !self.hasAircraft

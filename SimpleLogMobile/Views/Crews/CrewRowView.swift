@@ -45,23 +45,26 @@ struct CrewRowView: View {
                     .font(.headline)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top)
-                VStack {
-                    if !crew.phone.strUnwrap.isEmpty {
-                        Text("Phone: \(crew.phone.strUnwrap)")
-                            .lineLimit(1)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 20)
-                    }
-                    if !crew.email.strUnwrap.isEmpty {
-                        Text("email: \(crew.email.strUnwrap)")
-                            .lineLimit(1)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 20)
-                    }
+                if !crew.phone.strUnwrap.isEmpty {
+                    Text("Phone: \(crew.phone.strUnwrap)")
+                        .lineLimit(1)
+                        .font(.caption)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.leading, 20)
                 }
-                .font(.caption)
+                if !crew.email.strUnwrap.isEmpty {
+                    Text("email: \(crew.email.strUnwrap)")
+                        .lineLimit(1)
+                        .font(.caption)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.leading, 20)
+                }
                 Spacer()
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .contentShape(Rectangle())
+            .onTapGesture {onTapGesture()}
+            
         }
         .frame(maxWidth: .infinity, minHeight: 70)
         .clipped()
@@ -74,6 +77,6 @@ struct CrewRowView: View {
                 onToggleLock: onToggleLock
             )
         }
-        .onTapGesture {onTapGesture()}
     }
+    
 }

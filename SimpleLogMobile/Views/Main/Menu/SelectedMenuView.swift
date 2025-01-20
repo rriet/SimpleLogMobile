@@ -20,8 +20,7 @@ struct SelectedMenuView: View {
             case .AircraftsView:
                 AircraftAndTypesView()
             case .AirportsView:
-                Text("Apt")
-//                AirportsView()
+                AirportsView()
             case .CrewView:
                 CrewsView()
             case .SummaryView:

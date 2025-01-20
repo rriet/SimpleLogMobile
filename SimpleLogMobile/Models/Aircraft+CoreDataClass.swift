@@ -21,7 +21,11 @@ public class Aircraft: NSManagedObject, SwipeableItem, Comparable {
     }
     
     var mtowString: String {
-        formatNumericValue(self.aircraftMtow)
+        if self.aircraftMtow == 0 {
+            return formatNumericValue(self.aircraftType?.mtow ?? 0)
+        } else {
+            return formatNumericValue(self.aircraftMtow)
+        }
     }
     
     var hasFlights: Bool {

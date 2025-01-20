@@ -36,7 +36,6 @@ struct AddEditCrewView: View {
     var body: some View {
         NavigationView {
             Form {
-                
                 Section {
                     VStack {
                         if let imageData = picture, let uiImage = UIImage(data: imageData) {
