@@ -48,14 +48,16 @@
         <relationship name="flights" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="crewMembers" inverseEntity="Flight"/>
         <relationship name="simTrainings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SimulatorTraining" inverseName="crew" inverseEntity="SimulatorTraining"/>
     </entity>
-    <entity name="DutyPeriod" representedClassName="DutyPeriod" syncable="YES" codeGenerationType="class">
+    <entity name="DutyPeriod" representedClassName="DutyPeriod" syncable="YES" codeGenerationType="category">
         <attribute name="factoredDutyTime" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <relationship name="dutyEnd" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="dutyEnd" inverseEntity="Timeline"/>
         <relationship name="dutyStart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="dutyStart" inverseEntity="Timeline"/>
     </entity>
     <entity name="Flight" representedClassName="Flight" syncable="YES" codeGenerationType="category">
         <attribute name="blockTime" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="endDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <relationship name="aircraft" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="flights" inverseEntity="Aircraft"/>
         <relationship name="arrAirport" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsArriving" inverseEntity="Airport"/>
         <relationship name="crewMembers" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Crew" inverseName="flights" inverseEntity="Crew"/>
@@ -71,13 +73,16 @@
         <relationship name="positioningDeparting" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="positioningDeparting" inverseEntity="Airport"/>
         <relationship name="positioningStart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="positioningStart" inverseEntity="Timeline"/>
     </entity>
-    <entity name="PreviousExperience" representedClassName="PreviousExperience" syncable="YES" codeGenerationType="class"/>
+    <entity name="PreviousExperience" representedClassName="PreviousExperience" syncable="YES" codeGenerationType="category">
+        <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+    </entity>
     <entity name="SimulatorTraining" representedClassName="SimulatorTraining" syncable="YES" codeGenerationType="category">
+        <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <relationship name="aircraft" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="simTrainings" inverseEntity="Aircraft"/>
         <relationship name="crew" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Crew" inverseName="simTrainings" inverseEntity="Crew"/>
         <relationship name="startTimeline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="simulatorStart" inverseEntity="Timeline"/>
     </entity>
-    <entity name="Timeline" representedClassName="Timeline" syncable="YES" codeGenerationType="class">
+    <entity name="Timeline" representedClassName="Timeline" syncable="YES" codeGenerationType="category">
         <attribute name="dateValue" attributeType="Date" usesScalarValueType="NO"/>
         <relationship name="dutyEnd" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DutyPeriod" inverseName="dutyEnd" inverseEntity="DutyPeriod"/>
         <relationship name="dutyStart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DutyPeriod" inverseName="dutyStart" inverseEntity="DutyPeriod"/>
