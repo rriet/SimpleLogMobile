@@ -33,7 +33,7 @@ struct AddEditAircraftView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 InputField(
                     "Registration",
@@ -148,8 +148,7 @@ struct AddEditAircraftView: View {
                             registration: registration,
                             aircraftMtow: aircraftMtow,
                             aircraftType: typeUnwraped,
-                            isSimulator: isSimulator,
-                            isLocked: false
+                            isSimulator: isSimulator
                         )
                 } else {
                     // Editing an existing aircraft type
@@ -158,8 +157,7 @@ struct AddEditAircraftView: View {
                         registration: registration,
                         aircraftMtow: aircraftMtow,
                         aircraftType: typeUnwraped,
-                        isSimulator: isSimulator,
-                        isLocked: false
+                        isSimulator: isSimulator
                     )
                 }
                 try aircraftVM.fetchAircraftList()

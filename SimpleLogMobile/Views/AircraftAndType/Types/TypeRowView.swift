@@ -9,7 +9,6 @@ import SwiftUI
 
 struct TypeRowView: View {
     
-//    @Binding var aircraftType: AircraftType
     @ObservedObject var aircraftType: AircraftType
     let onDelete: () -> Void
     let onEdit: () -> Void
@@ -21,29 +20,25 @@ struct TypeRowView: View {
             Text(aircraftType.designator.strUnwrap)
                 .lineLimit(1)
                 .font(.title3)
-                .frame(idealWidth: 100, maxWidth: .infinity, alignment: .leading)
+                .frame(maxWidth: .infinity, alignment: .leading)
             
-            ViewThatFits {
-                VStack(alignment: .leading) {
-                    Text("Maker: \(aircraftType.maker.strUnwrap)")
-                        .lineLimit(1)
-                    Text("Engine: \(aircraftType.engine)")
-                        .lineLimit(1)
-                    Text("Category: \(aircraftType.category)")
-                        .lineLimit(1)
-                    Text("MTOW: \(aircraftType.mtow)")
-                        .lineLimit(1)
-                }
-                VStack(alignment: .leading) {
-                    Text("\(aircraftType.maker.strUnwrap)")
-                        .lineLimit(1)
-                    Text("\(aircraftType.engine)")
-                        .lineLimit(1)
-                    Text("\(aircraftType.category)")
-                        .lineLimit(1)
-                    Text("\(aircraftType.mtow)")
-                        .lineLimit(1)
-                }
+            VStack(alignment: .trailing) {
+                Text("Maker:")
+                Text("Engine:")
+                Text("Category:")
+                Text("MTOW:")
+            }
+            .font(.caption)
+            
+            VStack(alignment: .leading) {
+                Text("\(aircraftType.maker.strUnwrap)")
+                    .lineLimit(1)
+                Text("\(aircraftType.engine)")
+                    .lineLimit(1)
+                Text("\(aircraftType.category)")
+                    .lineLimit(1)
+                Text("\(aircraftType.mtow)")
+                    .lineLimit(1)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .font(.caption)

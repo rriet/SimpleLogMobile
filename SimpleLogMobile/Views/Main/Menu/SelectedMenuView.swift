@@ -14,9 +14,7 @@ struct SelectedMenuView: View {
     var body: some View {
         switch selectedView {
             case .LogbookView:
-                Text("Logbook")
-//                ContentView()
-//                LogbookView()
+                TimelineView()
             case .AircraftsView:
                 AircraftAndTypesView()
             case .AirportsView:
@@ -31,7 +29,7 @@ struct SelectedMenuView: View {
 //                ReportsView()
             case .SettingsView:
                 Text("Settings")
-//                SettingsView()
+                SettingsView()
             case .AboutView:
                 Text("About")
 //                AboutView()

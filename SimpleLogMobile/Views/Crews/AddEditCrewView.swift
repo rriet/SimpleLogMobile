@@ -34,7 +34,7 @@ struct AddEditCrewView: View {
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 Section {
                     VStack {
@@ -186,8 +186,7 @@ struct AddEditCrewView: View {
                     email: email,
                     phone: phone,
                     notes: notes,
-                    picture: picture,
-                    isLocked: false
+                    picture: picture
                     )
             } else {
                 // Editing an existing aircraft type
@@ -197,8 +196,7 @@ struct AddEditCrewView: View {
                     email: email,
                     phone: phone,
                     notes: notes,
-                    picture: picture,
-                    isLocked: false
+                    picture: picture
                 )
             }
             try crewVM.fetchCrewList()

@@ -65,8 +65,7 @@ class AircraftTypeViewModel: ObservableObject {
         multiPilot: Bool = true,
         efis: Bool = true,
         complex: Bool = true,
-        highPerformance: Bool = true,
-        isLocked: Bool = false
+        highPerformance: Bool = true
     ) throws -> AircraftType {
         
         try checkTypeDesignator(designator)
@@ -76,6 +75,8 @@ class AircraftTypeViewModel: ObservableObject {
                 title: "Duplicated Type",
                 message: "This Aircraft Type already exists.")
         }
+        
+        let isLocked = AppSettings.autoLockNewEntries
         
         let newType = AircraftType(context: viewContext)
         

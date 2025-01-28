@@ -9,6 +9,7 @@ import Foundation
 import CoreData
 
 class CrewViewModel: ObservableObject {
+    
     private let viewContext = PersistenceController.shared.viewContext
     @Published var crewList: [Crew] = []
     
@@ -35,10 +36,11 @@ class CrewViewModel: ObservableObject {
         email: String = "",
         phone: String = "",
         notes: String = "",
-        picture: Data? = nil,
-        isLocked: Bool = false
+        picture: Data? = nil
     ) throws {
         let newCrew = Crew(context: viewContext)
+        
+        let isLocked = AppSettings.autoLockNewEntries
         
         try editCrew(newCrew,
                      name: name,

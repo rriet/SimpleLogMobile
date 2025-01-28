@@ -10,8 +10,6 @@ import CoreData
 
 struct CrewsView: View {
     
-    @Environment(\.managedObjectContext) private var viewContext
-    
     @ObservedObject private var crewVM = CrewViewModel()
     
     @State private var searchText: String = ""
@@ -31,57 +29,70 @@ struct CrewsView: View {
     @StateObject var alertManager = AlertManager()
     
     var body: some View {
-        VStack {
-            Text("Crew")
-                .font(.largeTitle)
-                .padding(.vertical, 1)
-            if !crewVM.crewList.isEmpty {
-                HStack {
-                    Text("Search:")
-                    TextField("Search", text: $searchText)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding(.horizontal)
-                        .onChange(of: searchText) { oldValue , newValue in
-                            filterCrewList()
-                        }
-                }
-                .padding(.horizontal)
-                if !filteredCrewList.isEmpty {
-                    List {
-                        ForEach(groupedFilteredCrewList.keys.sorted(), id: \.self) { fistLetter in
-                            Section(header: Text(fistLetter)) {
-                                ForEach(groupedFilteredCrewList[fistLetter] ?? [], id: \.self) { crew in
-                                    CrewRowView(
-                                        crew: crew,
-                                        onDelete: {
-                                            deleteCrew(crew)
-                                        },
-                                        onEdit: {
-                                            editCrew(crew)
-                                        },
-                                        onTapGesture: {
-                                            callEmail(crew)
-                                        },
-                                        onToggleLock: {
-                                            try! crewVM.toggleLocked(crew)
-                                        },
-                                        onImageTapGesture: {
-                                            selectedCrew = crew
-                                            showLargeImage = true
-                                        })
+        ZStack{
+            VStack {
+                Text("Crew")
+                    .font(.largeTitle)
+                    .padding(.vertical, 1)
+                if !crewVM.crewList.isEmpty {
+                    HStack {
+                        Text("Search:")
+                        TextField("Search", text: $searchText)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .padding(.horizontal)
+                            .onChange(of: searchText) { oldValue , newValue in
+                                filterCrewList()
+                            }
+                    }
+                    .padding(.horizontal)
+                    if !filteredCrewList.isEmpty {
+                        List {
+                            ForEach(groupedFilteredCrewList.keys.sorted(), id: \.self) { fistLetter in
+                                Section(header: Text(fistLetter)) {
+                                    ForEach(groupedFilteredCrewList[fistLetter] ?? [], id: \.self) { crew in
+                                        CrewRowView(
+                                            crew: crew,
+                                            onDelete: {
+                                                deleteCrew(crew)
+                                            },
+                                            onEdit: {
+                                                editCrew(crew)
+                                            },
+                                            onTapGesture: {
+                                                callEmail(crew)
+                                            },
+                                            onToggleLock: {
+                                                try! crewVM.toggleLocked(crew)
+                                            },
+                                            onImageTapGesture: {
+                                                selectedCrew = crew
+                                                showLargeImage = true
+                                            })
+                                    }
                                 }
                             }
+                            // Spacer to allow last entry to scroll pass the + button
+                            Section {
+                                Spacer()
+                                    .frame(height: 100)
+                                    .listRowBackground(Color.clear)
+                            }
                         }
-                        // Spacer to allow last entry to scroll pass the + button
-                        Section {
-                            Spacer()
-                                .frame(height: 100)
-                                .listRowBackground(Color.clear)
-                        }
+                        .listSectionSpacing(10)
+                        
+                    } else {
+                        Text("No Crew matching the search parameters.")
+                            .font(.subheadline)
+                            .foregroundColor(Color.theme.foreground)
+                            .frame(
+                                maxWidth: .infinity,
+                                maxHeight: .infinity,
+                                alignment: .center
+                            )
+                            .background(Color.theme.secondaryBackground)
                     }
-                    .listSectionSpacing(10)
                 } else {
-                    Text("No Crew matching search parameters.")
+                    Text("No Crew to display.")
                         .font(.subheadline)
                         .foregroundColor(Color.theme.foreground)
                         .frame(
@@ -91,16 +102,16 @@ struct CrewsView: View {
                         )
                         .background(Color.theme.secondaryBackground)
                 }
-            } else {
-                Text("No Crew to display.\nPress the \"Plus\" button to create a new Crewmemeber.")
-                    .font(.subheadline)
-                    .foregroundColor(Color.theme.foreground)
-                    .frame(
-                        maxWidth: .infinity,
-                        maxHeight: .infinity,
-                        alignment: .center
-                    )
-                    .background(Color.theme.secondaryBackground)
+            }
+            VStack{
+                Spacer()
+                Text("")
+                    .confirmationDialog("Contact", isPresented: $showCallMessageEmail) {
+                        EmailPhoneView(
+                            phone: selectedCrew?.phone ?? "",
+                            email: selectedCrew?.email ?? ""
+                        )
+                    }
             }
         }
         .onAppear {
@@ -128,12 +139,6 @@ struct CrewsView: View {
         .sheet(isPresented: $showLargeImage) {
             ZoomPictureView(crew: $selectedCrew)
                 .presentationDetents([.medium])
-        }
-        .actionSheet(isPresented: $showCallMessageEmail) {
-            EmailPhoneActionSheet.getActionSheet(
-                email: selectedCrew?.email.strUnwrap ?? "",
-                phone: selectedCrew?.phone.strUnwrap ?? ""
-            )
         }
         
         .frame(maxWidth: .infinity, maxHeight: .infinity)

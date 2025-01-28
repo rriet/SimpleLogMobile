@@ -46,7 +46,7 @@ struct AddEditTypeView: View {
     
     // Main body of the view
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 InputField(
                     "Designator",

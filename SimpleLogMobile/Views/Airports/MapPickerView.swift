@@ -24,65 +24,74 @@ struct MapPickerView: View {
     @Binding var longitude: Double
     
     var body: some View {
-        VStack {
-            Text("Tap on the map to select location")
-            // Map view
-            MapReader { proxy in
-                Map(position: $position)
-                    .mapStyle(.hybrid)
-                    .onTapGesture { position in
-                        if let coordinate = proxy.convert(position, from: .local) {
-                            selectedCoordinates = coordinate
-                            latitude = coordinate.latitude
-                            longitude = coordinate.longitude
+        NavigationStack {
+            VStack {
+                Text("Tap on the map to select location")
+                // Map view
+                MapReader { proxy in
+                    Map(position: $position)
+                        .mapStyle(.hybrid)
+                        .onTapGesture { position in
+                            if let coordinate = proxy.convert(position, from: .local) {
+                                selectedCoordinates = coordinate
+                                latitude = coordinate.latitude
+                                longitude = coordinate.longitude
+                            }
+                        }
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    dismiss()
+                }) {
+                    VStack {
+                        Text("Selected This Location:")
+                            .font(.headline)
+                        HStack {
+                            VStack(alignment: .trailing) {
+                                Text("Latitude:")
+                                Text("Longitude:")
+                            }
+                            VStack(alignment: .leading) {
+                                Text("\(latitude.stringFromLatitude())")
+                                Text("\(longitude.stringFromLongitude())")
+                            }
                         }
                     }
+                    .font(.caption)
+                    .padding()
+                }
+                .foregroundColor(.white)
+                .background(
+                    Color.blue
+                        .cornerRadius(10)
+                        .shadow(radius: 10))
             }
-//            .frame(height: 600)
-            
-            Spacer()
-            
-            Button(action: {
-                dismiss()
-            }) {
-                VStack {
-                    Text("Selected This Location:")
-                        .font(.headline)
-                    HStack {
-                        VStack(alignment: .trailing) {
-                            Text("Latitude:")
-                            Text("Longitude:")
-                        }
-                        VStack(alignment: .leading) {
-                            Text("\(latitude.stringFromLatitude())")
-                            Text("\(longitude.stringFromLongitude())")
-                        }
+            .padding()
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
                     }
                 }
-                .font(.caption)
-                .padding()
             }
-            .foregroundColor(.white)
-            .background(
-                Color.blue
-                .cornerRadius(10)
-                .shadow(radius: 10))
+            .onAppear {
+                centerMap()
+            }
         }
-        .padding()
-        .onAppear {
-            centerMap()
-        }
+        
     }
     
     private func centerMap() {
-        if !latitude.isZero && !longitude.isZero {
+        if !latitude.isZero || !longitude.isZero {
             position = MapCameraPosition.region(
                 MKCoordinateRegion(
                     center: CLLocationCoordinate2D(
                         latitude: latitude,
                         longitude: longitude
                     ),
-                    span: MKCoordinateSpan(latitudeDelta: 1, longitudeDelta: 1)
+                    span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
                 )
             )
         }

@@ -24,18 +24,22 @@ struct AddEditAirportView: View {
     @State private var country: String = ""
     @State private var latitude: Double = 0
     @State private var longitude: Double = 0
+    @State private var isFavorite: Bool = false
     
     @StateObject var alertManager = AlertManager()
     
     @State private var showMapPickerView: Bool = false
     
-    init(_ airport: Binding<Airport?>, airportVM: AirportViewModel) {
+    let onSave: () -> Void
+    
+    init(_ airport: Binding<Airport?>, airportVM: AirportViewModel, onSave: @escaping () -> Void) {
         self.airportVM = airportVM
         self._airportToEdit = airport
+        self.onSave = onSave
     }
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Form {
                 InputField(
                     "ICAO",
@@ -72,6 +76,11 @@ struct AddEditAirportView: View {
                     textValue: $country,
                     capitalization: .words
                 )
+                
+                Toggle(isOn: $isFavorite) {
+                    Text("Favorite")
+                        .font(.title2)
+                }
                 
                 HStack {
                     VStack(alignment: .trailing) {
@@ -146,7 +155,9 @@ struct AddEditAirportView: View {
         country = receivedAirport.country.strUnwrap
         latitude = receivedAirport.latitude
         longitude = receivedAirport.longitude
+        isFavorite = receivedAirport.isFavorite
     }
+    
     private func saveAirport() {
 
         do {
@@ -161,7 +172,7 @@ struct AddEditAirportView: View {
                         country: country,
                         latitude: latitude,
                         longitude: longitude,
-                        isLocked: false
+                        isFavorite: isFavorite
                     )
             } else {
                 // Editing an existing Airport
@@ -175,10 +186,11 @@ struct AddEditAirportView: View {
                         country: country,
                         latitude: latitude,
                         longitude: longitude,
-                        isLocked: false
+                        isFavorite: isFavorite
                     )
             }
-            try airportVM.fetchAirportList()
+//            try airportVM.fetchAirportList()
+            onSave()
         } catch let details as ErrorDetails {
             // Handle specific error details
             alertManager.showAlert(.error(details: details))

@@ -35,10 +35,11 @@ class AircraftViewModel: ObservableObject {
         registration: String,
         aircraftMtow: String,
         aircraftType: AircraftType,
-        isSimulator: Bool,
-        isLocked: Bool = false
+        isSimulator: Bool
     ) throws {
         let newAircraft = Aircraft(context: viewContext)
+        
+        let isLocked = AppSettings.autoLockNewEntries
         
         try editAircraft(
             aircraftToEdit: newAircraft,

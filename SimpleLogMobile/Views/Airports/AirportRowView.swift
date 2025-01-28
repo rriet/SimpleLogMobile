@@ -9,57 +9,60 @@ import SwiftUI
 
 struct AirportRowView: View {
     
-    var airport: Airport
+    @Binding var airport: Airport
     let onDelete: () -> Void
     let onEdit: () -> Void
     let onTapGesture: () -> Void
     let onToggleLock: () -> Void
+    let onToggleFavorite: () -> Void
     
     var body: some View {
-        
-        HStack {
-            HStack{
-                VStack(alignment: .trailing) {
+        HStack{
+            Grid(alignment: .topLeading,
+                 horizontalSpacing: 1,
+                 verticalSpacing: 3) {
+                GridRow {
                     Text("ICAO:")
-                        .font(.headline)
-                    Text("Name:")
-                    Text("City:")
-                    Text("Country:")
-                }
-                VStack(alignment: .leading) {
+                        .gridColumnAlignment(.trailing)
                     Text(airport.icao.strUnwrap)
-                        .font(.headline)
-                    Text("\(airport.name.strUnwrap) ")
-                    Text("\(airport.city.strUnwrap) ")
-                    Text("\(airport.country.strUnwrap) ")
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            
-            HStack{
-                VStack(alignment: .trailing) {
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     Text("IATA:")
-                        .font(.headline)
-                    Text("Latitude:")
-                    Text("Longitude:")
-                    Spacer()
-                }
-                VStack(alignment: .leading) {
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                        .gridColumnAlignment(.trailing)
                     Text("\(airport.iata.strUnwrap) ")
-                        .font(.headline)
-                    Text("\(airport.latitude.stringFromLatitude()) ")
-                    Text("\(airport.longitude.stringFromLongitude()) ")
-                    Spacer()
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .font(.headline)
+                GridRow {
+                    Text("Name:")
+                    Text("\(airport.name.strUnwrap) ")
+                        .gridCellColumns(3)
+                }
+                GridRow {
+                    Text("City:")
+                    Text(airport.city.strUnwrap)
+                        .gridCellColumns(3)
+                }
+                GridRow {
+                    Text("Country:")
+                    Text(airport.country.strUnwrap)
+                        .gridCellColumns(3)
                 }
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+                 .lineLimit(1)
+                 .clipped()
+                 .font(.caption)
+                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                 .contentShape(Rectangle())
+                 .onTapGesture {onTapGesture()}
+
+            Button(action: onToggleFavorite) {
+                Image(systemName: airport.isFavorite ? "star.fill" : "star")
+                    .foregroundColor(airport.isFavorite ? .yellow : .gray)
+                    .padding(.trailing, 8)
+            }
+            .buttonStyle(BorderlessButtonStyle())
         }
-        .lineLimit(1)
-        .font(.caption)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .contentShape(Rectangle())
-        .onTapGesture {onTapGesture()}
-        .clipped()
         .listRowBackground(Color.theme.background)
         .swipeActions(allowsFullSwipe: false) {
             SwipeActionsView<Airport>(

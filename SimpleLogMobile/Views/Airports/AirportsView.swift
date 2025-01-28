@@ -10,22 +10,13 @@ import CoreData
 
 struct AirportsView: View {
     
-    @Environment(\.managedObjectContext) private var viewContext
-    
     @ObservedObject private var airportVM = AirportViewModel()
     
     @State private var searchText: String = ""
-    @State private var filteredAirportList: [Airport] = []
-    
-    var groupedFilteredAirportList: [String: [Airport]] {
-        Dictionary(grouping: filteredAirportList) { airport in
-            guard let icao = airport.icao, !icao.isEmpty else { return "" }
-            return String(icao.prefix(1)).uppercased()
-        }
-    }
     
     @State private var selectedAirport: Airport?
     @State private var showAddEdit = false
+    @State private var showOnMap = false
     @StateObject var alertManager = AlertManager()
     
     var body: some View {
@@ -33,49 +24,63 @@ struct AirportsView: View {
             Text("Airport")
                 .font(.largeTitle)
                 .padding(.vertical, 1)
+            HStack {
+                Text("Search:")
+                TextField("Search", text: $searchText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .padding(.horizontal)
+                    .onChange(of: searchText) { oldValue , newValue in
+                        try! airportVM.fetchAirportList(searchText: newValue, refresh: true)
+                    }
+            }
+            .padding(.horizontal)
             if !airportVM.airportList.isEmpty {
-                HStack {
-                    Text("Search:")
-                    TextField("Search", text: $searchText)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .padding(.horizontal)
-                        .onChange(of: searchText) { oldValue , newValue in
-                            filterAirportList()
-                        }
-                }
-                .padding(.horizontal)
-                if !groupedFilteredAirportList.isEmpty {
-                    List {
-                        ForEach(groupedFilteredAirportList.keys.sorted(), id: \.self) { fistLetter in
-                            Section(header: Text(fistLetter)) {
-                                ForEach(groupedFilteredAirportList[fistLetter] ?? [], id: \.self) { airport in
-                                    AirportRowView(
-                                        airport: airport,
-                                        onDelete: {
-                                            deleteAirport(airport)
-                                        },
-                                        onEdit: {
-                                            editAirport(airport)
-                                        },
-                                        onTapGesture: {
-                                            
-                                        },
-                                        onToggleLock: {
-                                            try! airportVM.toggleLocked(airport)
-                                        })
-                                }
+                List {
+                    ForEach($airportVM.airportList, id: \.self) { $airport in
+                        AirportRowView(
+                            airport: $airport,
+                            onDelete: {
+                                deleteAirport(airport)
+                            },
+                            onEdit: {
+                                editAirport(airport)
+                            },
+                            onTapGesture: {
+                                showAirport(airport)
+                            },
+                            onToggleLock: {
+                                try! airportVM.toggleLocked(airport)
+                            },
+                            onToggleFavorite: {
+                                try! airportVM.toggleFavorite(airport)
+                            })
+                        .onAppear {
+                            if airport == airportVM.airportList.last {
+                                try! airportVM.fetchAirportList(offset: airportVM.airportList.count, searchText: searchText)
                             }
                         }
-                        // Spacer to allow last entry to scroll pass the + button
-                        Section {
-                            Spacer()
-                                .frame(height: 100)
-                                .listRowBackground(Color.clear)
-                        }
                     }
-                    .listSectionSpacing(10)
+                    // Spacer to allow last entry to scroll pass the + button
+                    Section {
+                        Spacer()
+                            .frame(height: 100)
+                            .listRowBackground(Color.clear)
+                    }
+                }
+                .listSectionSpacing(10)
+            } else {
+                if (searchText.isEmpty) {
+                    Text("No Airports in the database.")
+                        .font(.subheadline)
+                        .foregroundColor(Color.theme.foreground)
+                        .frame(
+                            maxWidth: .infinity,
+                            maxHeight: .infinity,
+                            alignment: .center
+                        )
+                        .background(Color.theme.secondaryBackground)
                 } else {
-                    Text("No Airport matching search parameters.")
+                    Text("No Airports matching the search criteria.")
                         .font(.subheadline)
                         .foregroundColor(Color.theme.foreground)
                         .frame(
@@ -85,56 +90,39 @@ struct AirportsView: View {
                         )
                         .background(Color.theme.secondaryBackground)
                 }
-            } else {
-                Text("No Airport to display.\nPress the \"Plus\" button to create a new Airport.")
-                    .font(.subheadline)
-                    .foregroundColor(Color.theme.foreground)
-                    .frame(
-                        maxWidth: .infinity,
-                        maxHeight: .infinity,
-                        alignment: .center
-                    )
-                    .background(Color.theme.secondaryBackground)
             }
-        }
-        .onAppear {
-            filterAirportList()
         }
         .alert(item: $alertManager.currentAlert) { alertInfo in
             alertManager.getAlert(alertInfo)
         }
-        // Hides the background of the list, so the color propagates from the back
-        .scrollContentBackground(.hidden)
+        .sheet(isPresented: $showAddEdit) {
+            AddEditAirportView(
+                $selectedAirport,
+                airportVM: airportVM,
+                onSave: {
+                    try! airportVM.fetchAirportList(searchText: searchText, refresh: true)
+                })
+                .interactiveDismissDisabled()
+        }
+        .sheet(isPresented: $showOnMap) {
+            ShowMapView(airport: $selectedAirport)
+        }
         .floatingButton(
             buttonContent: AnyView(
                 Image(systemName: "plus")
                     .foregroundColor(.white)
                     .font(.title)
             ), action: newAirport)
-        
-        // Edit Screen
-        // sheet works on all systems, but is dismissible on IOS, not dismissible on MacOS
-        .sheet(isPresented: $showAddEdit) {
-            AddEditAirportView($selectedAirport, airportVM: airportVM)
-                .interactiveDismissDisabled()
-        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(Color.theme.secondaryBackground))
-        .onChange(of: airportVM.airportList, filterAirportList)
+        // Hides the background of the list, so the color propagates from the back
+        .scrollContentBackground(.hidden)
+        
     }
     
-    private func filterAirportList() {
-        if searchText.isEmpty {
-            filteredAirportList = airportVM.airportList
-        } else {
-            filteredAirportList = airportVM.airportList.filter { airport in
-                airport.icao.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
-                airport.iata.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
-                airport.name.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
-                airport.country.strUnwrap
-                    .localizedCaseInsensitiveContains(searchText)
-            }
-        }
+    private func showAirport(_ airport: Airport) {
+        self.selectedAirport = airport
+        showOnMap.toggle()
     }
     
     private func deleteAirport(_ airportToDelete: Airport) {
@@ -161,7 +149,6 @@ struct AirportsView: View {
             confirmAction: {
                 do {
                     try airportVM.deleteAirport(airportToDelete)
-                    try airportVM.fetchAirportList()
                 } catch let details as ErrorDetails {
                     alertManager.showAlert(.error(details: details))
                 } catch {

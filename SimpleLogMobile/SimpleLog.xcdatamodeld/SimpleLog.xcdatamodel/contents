@@ -29,14 +29,15 @@
         <attribute name="country" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="iata" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="icao" attributeType="String" defaultValueString=""/>
+        <attribute name="isFavorite" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
         <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="name" optional="YES" attributeType="String" defaultValueString=""/>
-        <relationship name="flightsArriving" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="arrAirport" inverseEntity="Flight"/>
-        <relationship name="flightsDeparting" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="depAirport" inverseEntity="Flight"/>
-        <relationship name="positioningArriving" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Positioning" inverseName="positioningArriving" inverseEntity="Positioning"/>
-        <relationship name="positioningDeparting" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Positioning" inverseName="positioningDeparting" inverseEntity="Positioning"/>
+        <relationship name="flightsArriving" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="airportArr" inverseEntity="Flight"/>
+        <relationship name="flightsDeparting" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="airportDep" inverseEntity="Flight"/>
+        <relationship name="positioningArriving" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Positioning" inverseName="airportArr" inverseEntity="Positioning"/>
+        <relationship name="positioningDeparting" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Positioning" inverseName="airportDep" inverseEntity="Positioning"/>
     </entity>
     <entity name="Crew" representedClassName="Crew" syncable="YES" codeGenerationType="category">
         <attribute name="email" optional="YES" attributeType="String" defaultValueString=""/>
@@ -55,22 +56,47 @@
         <relationship name="dutyStart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="dutyStart" inverseEntity="Timeline"/>
     </entity>
     <entity name="Flight" representedClassName="Flight" syncable="YES" codeGenerationType="category">
-        <attribute name="blockTime" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="endDate" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="apporacheIfr" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="apporacheType" optional="YES" attributeType="String"/>
+        <attribute name="dateEnd" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateLanding" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="dateTakeoff" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="landingDay" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="landingNight" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="remarks" optional="YES" attributeType="String"/>
+        <attribute name="takeoffDay" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="takeoffNight" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeBlock" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeCustom1" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeCustom2" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeCustom3" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeCustom4" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeDual" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeFlight" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeIfr" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeInstructor" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeNight" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timePic" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timePicUs" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeSic" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeSimInst" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeXc" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="aircraft" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="flights" inverseEntity="Aircraft"/>
-        <relationship name="arrAirport" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsArriving" inverseEntity="Airport"/>
+        <relationship name="airportArr" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsArriving" inverseEntity="Airport"/>
+        <relationship name="airportDep" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsDeparting" inverseEntity="Airport"/>
         <relationship name="crewMembers" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Crew" inverseName="flights" inverseEntity="Crew"/>
-        <relationship name="depAirport" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsDeparting" inverseEntity="Airport"/>
         <relationship name="startTimeline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="flightStart" inverseEntity="Timeline"/>
     </entity>
     <entity name="Positioning" representedClassName="Positioning" syncable="YES" codeGenerationType="category">
+        <attribute name="dateEnd" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="dutyTime" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="endDate" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
         <attribute name="totalTime" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="positioningArriving" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="positioningArriving" inverseEntity="Airport"/>
-        <relationship name="positioningDeparting" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="positioningDeparting" inverseEntity="Airport"/>
+        <relationship name="airportArr" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="positioningArriving" inverseEntity="Airport"/>
+        <relationship name="airportDep" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="positioningDeparting" inverseEntity="Airport"/>
         <relationship name="positioningStart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="positioningStart" inverseEntity="Timeline"/>
     </entity>
     <entity name="PreviousExperience" representedClassName="PreviousExperience" syncable="YES" codeGenerationType="category">

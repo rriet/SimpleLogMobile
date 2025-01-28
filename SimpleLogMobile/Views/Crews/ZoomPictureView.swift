@@ -14,7 +14,7 @@ struct ZoomPictureView: View {
     @Binding var crew: Crew?
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             if let selectedCrew = crew {
                 if let imageData = selectedCrew.picture, let uiImage = UIImage(
                     data: imageData
