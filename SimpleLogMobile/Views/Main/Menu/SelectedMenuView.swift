@@ -28,7 +28,6 @@ struct SelectedMenuView: View {
                 Text("Reports")
 //                ReportsView()
             case .SettingsView:
-                Text("Settings")
                 SettingsView()
             case .AboutView:
                 Text("About")

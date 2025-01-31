@@ -13,6 +13,7 @@ struct AppSettings {
     // Keys for UserDefaults
     enum Keys {
         static let autoLockNewEntries = "autoLockNewEntries"
+        static let logTakeOffAndLanding = "logTakeOffAndLanding"
         static let hourInputMode = "hourInputMode"
     }
     
@@ -25,22 +26,27 @@ struct AppSettings {
         }
     }
     
-    static var hourInputMode: InputHour.Mode {
+    static var logTakeOffAndLanding: Bool {
         get {
-            guard let data = defaults.data(forKey: Keys.hourInputMode) else {
-                return InputHour.Mode.text
-            }
-            let decoder = JSONDecoder()
-            if let decoded = try? decoder.decode(InputHour.Mode.self, from: data) {
-                return decoded
-            }
-            return InputHour.Mode.text
+            defaults.bool(forKey: Keys.logTakeOffAndLanding)
         }
         set {
-            let encoder = JSONEncoder()
-            if let encoded = try? encoder.encode(newValue) {
-                defaults.set(encoded, forKey: Keys.hourInputMode)
+            defaults.set(newValue, forKey: Keys.logTakeOffAndLanding)
+        }
+    }
+    
+    static var hourInputMode: InputHour.Mode {
+        get {
+            // Default to .text if no value is stored
+            guard let rawValue = defaults.string(forKey: Keys.hourInputMode) else {
+                return .text
             }
+            
+            // Try to create an enum value from the rawValue string
+            return InputHour.Mode(rawValue: rawValue) ?? .text
+        }
+        set {
+            defaults.set(newValue.rawValue, forKey: Keys.hourInputMode)
         }
     }
     

@@ -22,7 +22,7 @@ extension CLLocationCoordinate2D {
 
 extension Double {
     func stringFromLatitude() -> String {
-        var latitudeString = String(format: "%02d° ", abs(Int(self))) +
+        let latitudeString = String(format: "%02d° ", abs(Int(self))) +
         String(format: "%05.2f'", abs(self.truncatingRemainder(dividingBy: 1)) * 60)
         
         // Generate correct cardinal suffix
@@ -34,7 +34,7 @@ extension Double {
     }
     
     func stringFromLongitude() -> String {
-        var longitudeString = String(format: "%03d° ", abs(Int(self))) +
+        let longitudeString = String(format: "%03d° ", abs(Int(self))) +
         String(format: "%05.2f'", abs(self.truncatingRemainder(dividingBy: 1)) * 60)
         
         // Generate correct cardinal suffix

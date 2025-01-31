@@ -59,49 +59,42 @@ struct AddEditFlight: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section(header: Text("From")) {
+                Section {
+                    InputDate(
+                        title: "Date",
+                        dateStart: $dateStart
+                    )
+                    
                     DatePicker(
-                        "Date:",
+                        "Test",
                         selection: $dateStart,
-                        displayedComponents: .date
-                    )
-                    DatePicker(
-                        "Block Out Time:",
-                        selection: $dateStart,
                         displayedComponents: .hourAndMinute
                     )
-                    DatePicker(
-                        "Take-off Time:",
-                        selection: $dateTakeOff,
-                        displayedComponents: .hourAndMinute
-                    )
+                    
                     InputHour(
-                        date: $dateTakeOff,
+                        date: $dateStart,
                         mode: AppSettings.hourInputMode,
-                        title: "Take-off Time"
+                        title: "Block Off"
                     )
-                }
-                
-                Section(header: Text("To")) {
-                    DatePicker(
-                        "Landing Time",
-                        selection: $dateLanding,
-                        displayedComponents: .hourAndMinute
-                    )
-                    InputHour(
-                        date: $dateLanding,
-                        mode: AppSettings.hourInputMode,
-                        title: "Landing Time"
-                    )
+                    
+                    if AppSettings.logTakeOffAndLanding {
+                        InputHour(
+                            date: $dateTakeOff,
+                            mode: AppSettings.hourInputMode,
+                            title: "Take Off"
+                        )
+                        
+                        InputHour(
+                            date: $dateLanding,
+                            mode: AppSettings.hourInputMode,
+                            title: "Landing"
+                        )
+                    }
+                    
                     InputHour(
                         date: $dateEnd,
                         mode: AppSettings.hourInputMode,
-                        title: "Block In Time"
-                    )
-                    DatePicker(
-                        "Block In Time:",
-                        selection: $dateEnd,
-                        displayedComponents: .hourAndMinute
+                        title: "Block In"
                     )
                 }
                 
