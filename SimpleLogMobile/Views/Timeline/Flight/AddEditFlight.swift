@@ -96,6 +96,7 @@ struct AddEditFlight: View {
                         mode: AppSettings.hourInputMode,
                         title: "Block In"
                     )
+                    
                 }
                 
                 Section(header: Text("")) {

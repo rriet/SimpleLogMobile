@@ -200,6 +200,7 @@ struct InputHour: View {
             // Valid
             isInvalid = false
             backgroundColor = Color.theme.secondaryBackground
+            setDate(timeText)
         } else {
             // Invalid
             isInvalid = true
@@ -208,29 +209,16 @@ struct InputHour: View {
     }
     
     private func isValidTime(_ time: String) -> Bool {
-        // Regular expression to match the format "HH:MM"
-        let timeRegex = #"^(?:[01]?\d|2[0-3]):([0-5]?\d)$"#
-        
-        // Check if the time matches the regular expression
-        let timePredicate = NSPredicate(format: "SELF MATCHES %@", timeRegex)
-        if timePredicate.evaluate(with: time) {
-            return true
-        } else {
-            return false
-        }
+        return time.range(of: #"^([01]\d|2[0-3]):([0-5]\d)$"#, options: .regularExpression) != nil
     }
     
     private func setDate(_ input: String) {
-        let cleanTime = input.filter { $0.isNumber }
-        
-        // Pad with leading zeros to ensure at least 4 characters
-        let rawTime = String(repeating: "0", count: max(0, 4 - cleanTime.count)) + cleanTime
-        
-        let hour = Int(rawTime.prefix(2)) ?? 0
-        let minute = Int(rawTime.suffix(2)) ?? 0
-        
-        if hour >= 0 && hour < 24 && minute >= 0 && minute < 60 {
+        if isValidTime(input) {
             isInvalid = false
+            
+            let hour = Int(input.prefix(2)) ?? 0
+            let minute = Int(input.suffix(2)) ?? 0
+            
             backgroundColor = Color.theme.secondaryBackground
             
             // Update the date with the validated time
@@ -240,7 +228,7 @@ struct InputHour: View {
             components.minute = minute
             if let newDate = calendar.date(from: components) {
                 date = newDate
-                isEditing = false
+                isUpdating = false
             }
         } else {
             isEditing = true
