@@ -18,7 +18,7 @@ struct InputHour: View {
     // MARK: - Control Variables
     @State private var timeText: String = ""
     @State private var isInvalid: Bool = false
-    @State private var isUpdating: Bool = true
+    @State private var isUpdating: Bool = false
     @State private var backgroundColor: Color = Color.theme.secondaryBackground
     @FocusState private var isFocused: Bool
 
@@ -57,26 +57,17 @@ struct InputHour: View {
                             .background(backgroundColor)
                             .multilineTextAlignment(.center)
                             .cornerRadius(5)
-                            .toolbar {
-                                if isFocused {
-                                    ToolbarItemGroup(placement: .keyboard) {
-                                        Spacer()
-                                        Button("Done") {
-                                            isFocused = false
-                                        }
-                                    }
-                                }
-                            }
+                            .toolbar { keyboardToolbar }
                             .focused($isFocused)
-                            .onChange(of: isFocused, focusedChanged)
+                            .onChange(of: isFocused, handleFocusChange)
                             .onChange(of: timeText, timeTextChanged)
                             .onAppear {
                                 // Initialize the text field with the current time
-                                updateTimeText(from: date)
+                                setTextFromDate(date)
                             }
                             .onChange(of: date) { oldDate, newDate in
                                 // Update the text field when the date changes externaly
-                                updateTimeText(from: newDate)
+                                setTextFromDate(newDate)
                             }
                     if isInvalid {
                         Text("Invalid time")
@@ -88,12 +79,30 @@ struct InputHour: View {
         }
     }
     
+    // MARK: - Keyboard Toolbar
+        private var keyboardToolbar: some ToolbarContent {
+            ToolbarItemGroup(placement: .keyboard) {
+                if isFocused {
+                    Spacer()
+                    Button("Done") { isFocused = false }
+                }
+            }
+        }
+    
     // MARK: - UI functions
     
-    private func focusedChanged(){
+    private func handleFocusChange(){
+        
+        // lost focus
         if !isFocused {
-            // lost focus
-            doneEditing()
+            var cleanInput = timeText.filter { $0.isNumber }
+            cleanInput = String(repeating: "0", count: max(0, 4 - cleanInput.count)) + cleanInput
+            
+            let hours = String(cleanInput.prefix(2))
+            let minutes = String(cleanInput.suffix(cleanInput.count - 2))
+            updateTimeText("\(hours):\(minutes)")
+            
+            validateTime()
         }
         
         // Reset isEditing when focus gain or loss
@@ -101,74 +110,26 @@ struct InputHour: View {
     }
     
     private func timeTextChanged(_ oldValue: String, _ newValue: String) {
-        
-        // only do something if the TextField has focus
-        if !isUpdating && isFocused {
-            backgroundColor = Color.yellow
-            
-            // First time the user types something
-            if !isEditing {
-                // Clean the text field and leave only the new number
-                firstInput(oldValue, newValue)
-                return
-            }
-            
-            // if not the first character, format string
-            timeText = formatTimeString(newValue)
-            
-            if timeText.count == 5 {
-                validateTime()
-            }
+        // only do something if the TextField has focus and the change was done by the user
+        if isUpdating {
+            return
         }
-        isUpdating = false
-    }
-    
-    private func updateTimeText(from date: Date) {
-        isUpdating = true
-        // if time was modified, reset time display
-        isEditing = false
-        isInvalid = false
-        backgroundColor = Color.theme.secondaryBackground
         
-        // Set time to received Date
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        timeText = formatter.string(from: date)
-    }
-    
-    // MARK: - Auxiliary functions
-    
-    private func firstInput(_ oldValue: String, _ newValue: String) {
-        isEditing = true
-        
-        // if user added a new char, get the char
-        if newValue.count > oldValue.count {
-            for digit in "0123456789" {
-                let countInOriginal = oldValue.filter { $0 == digit }.count
-                let countInModified = newValue.filter { $0 == digit }.count
-                
-                if countInModified > countInOriginal {
-                    timeText = String(digit)
-                    return
-                }
-            }
+        if !isEditing {
+            firstUserInput(oldValue, newValue)
+            return
         }
-        // if the user removed a char or no new number was found
-        timeText = ""
-    }
-    
-    private func formatTimeString(_ input: String) -> String {
-        // Remove any non numeric characters (including colons ":")
-        var cleanInput = input.filter { $0.isNumber }
+        
+        var cleanInput = newValue.filter { $0.isNumber }
         
         // Automatically insert ":" after the first one or two digits
         // 100 becomes 1:00 and 1000 becomes 10:00
         if cleanInput.count < 3 {
-            return cleanInput
+            updateTimeText(cleanInput)
         }else if cleanInput.count == 3 {
             let hours = String(cleanInput.prefix(1))
             let minutes = String(cleanInput.suffix(cleanInput.count - 1))
-            return "\(hours):\(minutes)"
+            updateTimeText("\(hours):\(minutes)")
         } else {
             // Limit to 4 digits
             if cleanInput.count > 4 {
@@ -176,25 +137,57 @@ struct InputHour: View {
             }
             let hours = String(cleanInput.prefix(2))
             let minutes = String(cleanInput.suffix(cleanInput.count - 2))
-            return "\(hours):\(minutes)"
+            updateTimeText("\(hours):\(minutes)")
+        }
+        
+        if timeText.count == 5 {
+            validateTime()
+        }
+        
+    }
+    
+    private func firstUserInput(_ oldValue: String, _ newValue: String) {
+        isEditing = true
+        backgroundColor = Color.yellow
+        
+        for digit in "0123456789" {
+            let countInOriginal = oldValue.filter { $0 == digit }.count
+            let countInModified = newValue.filter { $0 == digit }.count
+            
+            if countInModified > countInOriginal {
+                updateTimeText(String(digit))
+                return
+            }
+        }
+        updateTimeText("")
+    }
+    
+    private func setTextFromDate(_ newDate: Date) {
+        isEditing = false
+        isInvalid = false
+        backgroundColor = Color.theme.secondaryBackground
+        
+        // Set time to received Date
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        updateTimeText(formatter.string(from: newDate))   
+    }
+    
+    // MARK: - Auxiliary functions
+    
+    // function prevents the change in timeText to trigger the onChange function
+    private func updateTimeText(_ newText: String) {
+        isUpdating = true
+        timeText = newText
+        DispatchQueue.main.async {
+            self.isUpdating = false
         }
     }
     
-    
-    // when user finished editing, add leading zeroes and check value
-    private func doneEditing() {
-        // Remove any non numeric characters (including colons ":")
-        timeText = timeText.filter { $0.isNumber }
-        
-        // Pad with leading zeros to ensure at least 4 characters
-        timeText = String(repeating: "0", count: max(0, 4 - timeText.count)) + timeText
-        
-        timeText = formatTimeString(timeText)
-
-        validateTime()
+    private func isValidTime(_ time: String) -> Bool {
+        return time.range(of: #"^([01]\d|2[0-3]):([0-5]\d)$"#, options: .regularExpression) != nil
     }
     
-    // check if the time is valid and in the format "HH:MM"
     private func validateTime() {
         if isValidTime(timeText) {
             // Valid
@@ -208,18 +201,13 @@ struct InputHour: View {
         }
     }
     
-    private func isValidTime(_ time: String) -> Bool {
-        return time.range(of: #"^([01]\d|2[0-3]):([0-5]\d)$"#, options: .regularExpression) != nil
-    }
-    
     private func setDate(_ input: String) {
         if isValidTime(input) {
             isInvalid = false
+            backgroundColor = Color.theme.secondaryBackground
             
             let hour = Int(input.prefix(2)) ?? 0
             let minute = Int(input.suffix(2)) ?? 0
-            
-            backgroundColor = Color.theme.secondaryBackground
             
             // Update the date with the validated time
             let calendar = Calendar.current
@@ -228,7 +216,6 @@ struct InputHour: View {
             components.minute = minute
             if let newDate = calendar.date(from: components) {
                 date = newDate
-                isUpdating = false
             }
         } else {
             isEditing = true

@@ -59,6 +59,7 @@ struct AirportsView: View {
                                 try! airportVM.fetchAirportList(offset: airportVM.airportList.count, searchText: searchText)
                             }
                         }
+                        
                     }
                     // Spacer to allow last entry to scroll pass the + button
                     Section {

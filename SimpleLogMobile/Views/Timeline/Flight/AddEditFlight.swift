@@ -59,7 +59,7 @@ struct AddEditFlight: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section {
+                VStack {
                     InputDate(
                         title: "Date",
                         dateStart: $dateStart
@@ -98,6 +98,7 @@ struct AddEditFlight: View {
                     )
                     
                 }
+                
                 
                 Section(header: Text("")) {
                     HStack{
