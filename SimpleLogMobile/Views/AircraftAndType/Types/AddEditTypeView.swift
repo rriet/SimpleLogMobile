@@ -69,28 +69,12 @@ struct AddEditTypeView: View {
                     Button {
                         showFamilyPicker.toggle()
                     } label: {
-                        Image(systemName: "chevron.down") // Use an Image
+                        Image(systemName: "chevron.down")
                             .font(.system(size: 20, weight: .bold))
                             .frame(width: 44, height: 20)
                     }
                     .buttonStyle(.bordered)
                     .disabled(families.isEmpty)
-                    .popover(
-                        isPresented: $showFamilyPicker,
-                        content: {
-                            VStack(spacing: 16) {
-                                Picker("Families", selection: $family) {
-                                    Text("Select One").tag("")
-                                    ForEach(families, id: \.self) { familyName in
-                                        Text(familyName).tag(familyName)
-                                    }
-                                }
-                                .pickerStyle(.wheel)
-                            }
-                            .frame(width: 300, height: 200) // Optional: Set a fixed size for the popover
-                        }
-                    )
-                    .presentationCompactAdaptation(.popover)
                 }
                 
                 
@@ -129,7 +113,7 @@ struct AddEditTypeView: View {
                 Toggle("Multi-Pilot", isOn: $multiPilot)
                 Toggle("Multi-Engine", isOn: $multiEngine)
             }
-            .navigationTitle(typeToEdit == nil ? "Add Aircraft Type" : "Edit Aircraft Type") // Dynamic title
+            .navigationTitle(typeToEdit == nil ? "Add Aircraft Type" : "Edit Aircraft Type")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 // Cancel button
@@ -151,7 +135,10 @@ struct AddEditTypeView: View {
         .alert(item: $alertManager.currentAlert) { alertInfo in
             alertManager.getAlert(alertInfo) // Show alerts for errors or confirmations
         }
-        
+        .sheet(isPresented: $showFamilyPicker) {
+            FamilySelector(family: $family)
+                .presentationDetents([.medium])
+        }
     }
     
     private func checkExists(_ input: String) -> InputField.ErrorType?  {
@@ -246,5 +233,58 @@ struct AddEditTypeView: View {
         }
         // Dismiss the view after a successful save
         dismiss()
+    }
+}
+
+
+struct FamilySelector: View {
+    
+    // Environment property to dismiss the current view
+    @Environment(\.dismiss) var dismiss
+    
+    @EnvironmentObject var aircraftTypeVM: AircraftTypeViewModel
+    
+    @Binding var family: String
+    
+    @State private var families: [String] = []
+    @State var newFamily: String = ""
+    
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 16) {
+                Picker("Families", selection: $newFamily) {
+                    Text("Select One").tag("")
+                    ForEach(families, id: \.self) { familyName in
+                        Text(familyName).tag(familyName)
+                    }
+                }
+                .pickerStyle(.wheel)
+            }
+            .navigationBarTitle("Select a Family")
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        if !newFamily.isEmpty {
+                            family = newFamily
+                        }
+                        dismiss()
+                    }
+                }
+            }
+        }
+        .onAppear() {
+            try? families = aircraftTypeVM.fetchFamilyList()
+            
+            if families.contains(family) {
+                newFamily = family
+            } else {
+                newFamily = ""
+            }
+        }
     }
 }

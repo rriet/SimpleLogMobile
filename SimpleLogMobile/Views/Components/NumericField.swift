@@ -65,19 +65,17 @@ struct NumericField: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack(alignment: .top) {
-                Text("\(placeholder):")
-                    .foregroundColor(.secondary) // Label for the text field
+                Text("\(placeholder)")
+                    .frame(height: 35)
                 
                 VStack(alignment: .leading) {
                     TextField(isRequired ? "Required" : "", text: $textValue)
+                        .foregroundColor(.secondary)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
                     // Sets the keyboard type based on inputType
-#if os(iOS)
                         .keyboardType(keyboardType)
-#endif
                     // Disables autocorrection
                         .autocorrectionDisabled()
-                    // Workaround for an Apple bug
-                        .onLongPressGesture(minimumDuration: 0.0) { }
                     // Validates input when the text changes
                         .onChange(of: textValue, validateInput)
                     // Validates input on initial appearance

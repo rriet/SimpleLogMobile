@@ -26,9 +26,10 @@ struct AirportsView: View {
                 .padding(.vertical, 1)
             HStack {
                 Text("Search:")
-                TextField("Search", text: $searchText)
+                TextField("ICAO, IATA, Name, City or Country", text: $searchText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .padding(.horizontal)
+                    .textInputAutocapitalization(.characters)
+                    .autocorrectionDisabled()
                     .onChange(of: searchText) { oldValue , newValue in
                         try! airportVM.fetchAirportList(searchText: newValue, refresh: true)
                     }

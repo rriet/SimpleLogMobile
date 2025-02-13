@@ -28,6 +28,7 @@ struct InputField: View {
     enum InputType {
         case letters
         case lettersAndNumbers
+        case phone
         case email
         case any
     }
@@ -79,25 +80,25 @@ struct InputField: View {
     var body: some View {
         VStack(alignment: .leading) {
             HStack(alignment: .top) {
-                Text("\(placeholder):")
-                    .foregroundColor(.secondary)
+                Text("\(placeholder)")
+                    .frame(height: 35)
                 
                 VStack (alignment: .leading){
                     TextField(
                         isRequired ? "Required" : "",
                         text: $text,
                         axis: lines > 1 ? .vertical : .horizontal)
-#if os(iOS)
                         .keyboardType(keyboardType)
-#endif
                         .autocorrectionDisabled()
-                    /// Avoid Apple BUG https://forums.developer.apple.com/forums/thread/738726
-                        .onLongPressGesture(minimumDuration: 0.0) { }
                         .textInputAutocapitalization(capitalization)
                         .onChange(of: text, validateInput)
                         .onAppear(perform: validateInput)
                         .lineLimit(lines...lines)
+                        .foregroundColor(.secondary)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+//                        .popover(
                     if let errorCode = errorCode {
+                        
                         Text(errorDescription(for: errorCode))
                             .font(.caption)
                             .foregroundColor(.red)
@@ -142,6 +143,9 @@ struct InputField: View {
             case .lettersAndNumbers:
                 regex = "^[a-zA-Z0-9]+$"
                 regexError = "Only letters and numbers are allowed."
+            case .phone:
+                regex = "^\\+?\\d+$"
+                regexError = "Invalid phone number format."
             case .email:
                 regex = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Z|a-z]{2,}$"
                 regexError = "Invalid email format."
@@ -181,17 +185,18 @@ struct InputField: View {
                 return message
         }
     }
-#if os(iOS)
+    
     /// Returns the appropriate keyboard type for the input type.
     private var keyboardType: UIKeyboardType {
         switch inputType {
             case .letters, .lettersAndNumbers:
                 return .asciiCapable
+            case .phone:
+                return .phonePad
             case .email:
                 return .emailAddress
             case .any:
                 return .default
         }
     }
-#endif
 }

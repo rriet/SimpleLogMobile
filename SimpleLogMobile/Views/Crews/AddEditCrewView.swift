@@ -82,6 +82,7 @@ struct AddEditCrewView: View {
                 InputField(
                     "Phone",
                     textValue: $phone,
+                    inputType: .phone,
                     capitalization: .never
                 )
                 

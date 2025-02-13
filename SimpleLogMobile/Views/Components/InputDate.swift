@@ -14,8 +14,7 @@ struct InputDate: View {
     
     var body: some View {
         HStack {
-            Text("\(title):")
-                .foregroundColor(.secondary)
+            Text("\(title)")
             
             Spacer()
             

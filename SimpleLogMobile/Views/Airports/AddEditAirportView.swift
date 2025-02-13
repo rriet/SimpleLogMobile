@@ -46,7 +46,7 @@ struct AddEditAirportView: View {
                     textValue: $icao,
                     isInvalid: $isIcaoInvalid,
                     isRequired: true,
-                    minLength: 1,
+                    minLength: 3,
                     capitalization: .characters,
                     customValidation: { input in
                         checkExists(icao: input)
@@ -161,9 +161,11 @@ struct AddEditAirportView: View {
     private func saveAirport() {
 
         do {
+            var newAirport: Airport!
+            
             if airportToEdit == nil {
                 // Adding a new aircraft Airport
-                try airportVM
+                newAirport = try airportVM
                     .addAirport(
                         icao: icao,
                         iata: iata,
@@ -189,7 +191,9 @@ struct AddEditAirportView: View {
                         isFavorite: isFavorite
                     )
             }
-//            try airportVM.fetchAirportList()
+            if let newAirport = newAirport {
+                airportToEdit = newAirport
+            }
             onSave()
         } catch let details as ErrorDetails {
             // Handle specific error details

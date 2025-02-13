@@ -42,21 +42,26 @@ struct InputHour: View {
         HStack(alignment: .top) {
             switch mode {
                 case .picker:
-                    DatePicker(
-                        title,
-                        selection: $date,
-                        displayedComponents: .hourAndMinute
-                    )
+                    HStack {
+                        Text("\(title)")
+                            .lineLimit(1)
+                        DatePicker(
+                            "",
+                            selection: $date,
+                            displayedComponents: .hourAndMinute
+                        )
+                        .labelsHidden()
+                    }
                 case .text:
-                    Text("\(title):")
-                    Spacer()
+                HStack(alignment: .center) {
+                    Text("\(title)")
                     VStack{
                         TextField("", text: $timeText)
                             .keyboardType(.numberPad)
-                            .frame(width: 60, height: 30)
+                            .frame(width: 70, height: 35)
                             .background(backgroundColor)
                             .multilineTextAlignment(.center)
-                            .cornerRadius(5)
+                            .cornerRadius(7)
                             .toolbar { keyboardToolbar }
                             .focused($isFocused)
                             .onChange(of: isFocused, handleFocusChange)
@@ -69,10 +74,11 @@ struct InputHour: View {
                                 // Update the text field when the date changes externaly
                                 setTextFromDate(newDate)
                             }
-                    if isInvalid {
-                        Text("Invalid time")
-                            .foregroundColor(.red)
-                            .font(.caption)
+                        if isInvalid {
+                            Text("Invalid time")
+                                .foregroundColor(.red)
+                                .font(.caption)
+                        }
                     }
                 }
             }
@@ -170,7 +176,7 @@ struct InputHour: View {
         // Set time to received Date
         let formatter = DateFormatter()
         formatter.dateFormat = "HH:mm"
-        updateTimeText(formatter.string(from: newDate))   
+        updateTimeText(formatter.string(from: newDate))
     }
     
     // MARK: - Auxiliary functions

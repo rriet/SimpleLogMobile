@@ -15,13 +15,22 @@ class AirportViewModel: ObservableObject {
     private var batchSize = 20 // Number of airports to fetch per batch
     private var isFetching = false // Prevent multiple fetches at once
     
+    enum SearchType {
+        case all
+        case icao
+        case iata
+        case icaoIata
+        case beginsWithIcao
+        case beginsWithIata
+        case beginsWithIcaoIata
+    }
+    
     init() {
         try? fetchAirportList()
     }
     
-    func fetchAirportList(offset: Int = 0, searchText: String = "", refresh: Bool = false) throws {
+    func fetchAirportList(offset: Int = 0, searchText: String = "", refresh: Bool = false, searchType: SearchType = .all) throws {
         guard !isFetching else { return }
-        isFetching = true
         
         let request = Airport.fetchRequest()
         let sortStar = NSSortDescriptor(key: "isFavorite", ascending: false)
@@ -31,8 +40,26 @@ class AirportViewModel: ObservableObject {
         request.fetchOffset = offset
         
         if !searchText.isEmpty {
-            let predicate = NSPredicate(format: "(icao CONTAINS[cd] %@) OR (iata CONTAINS[cd] %@) OR (name CONTAINS[cd] %@) OR (city CONTAINS[cd] %@) OR (country CONTAINS[cd] %@)", searchText, searchText, searchText, searchText, searchText)
-            request.predicate = predicate
+            var predicate: NSPredicate?
+            switch searchType {
+                case .all:
+                    predicate = NSPredicate(format: "(icao CONTAINS[cd] %@) OR (iata CONTAINS[cd] %@) OR (name CONTAINS[cd] %@) OR (city CONTAINS[cd] %@) OR (country CONTAINS[cd] %@)", searchText, searchText, searchText, searchText, searchText)
+                case .icao:
+                    predicate = NSPredicate(format: "icao CONTAINS[cd] %@", searchText)
+                case .iata:
+                    predicate = NSPredicate(format: "iata CONTAINS[cd] %@", searchText)
+                case .icaoIata:
+                    predicate = NSPredicate(format: "(icao CONTAINS[cd] %@) OR (iata CONTAINS[cd] %@)", searchText, searchText)
+                case .beginsWithIcao:
+                    predicate = NSPredicate(format: "icao BEGINSWITH[cd] %@", searchText, searchText)
+                case .beginsWithIata:
+                    predicate = NSPredicate(format: "iata BEGINSWITH[cd] %@", searchText, searchText)
+                case .beginsWithIcaoIata:
+                    predicate = NSPredicate(format: "(icao BEGINSWITH[cd] %@) OR (iata BEGINSWITH[cd] %@)", searchText, searchText)
+            }
+            if let predicate = predicate {
+                request.predicate = predicate
+            }
         }
         
         let newAirports = try viewContext.fetch(request)
@@ -56,7 +83,7 @@ class AirportViewModel: ObservableObject {
         latitude: Double = 0,
         longitude: Double = 0,
         isFavorite: Bool = false
-    ) throws {
+    ) throws -> Airport {
         let newAirport = Airport(context: viewContext)
         
         let isLocked = AppSettings.autoLockNewEntries
@@ -71,6 +98,7 @@ class AirportViewModel: ObservableObject {
                          longitude: longitude,
                          isFavorite: isFavorite,
                          isLocked: isLocked)
+        return newAirport
     }
     
     func editAirport(_ airportToEdit: Airport,
@@ -85,10 +113,10 @@ class AirportViewModel: ObservableObject {
                          isLocked: Bool = false
     ) throws {
         
-        if icao.trimmingCharacters(in: .whitespaces).count < 1 {
+        if icao.trimmingCharacters(in: .whitespaces).count < 3 {
             throw ErrorDetails(
                 title: "Invalid ICAO",
-                message: "ICAO code must be at least 1 characters long.")
+                message: "ICAO code must be at least 3 characters long.")
         }
         
         airportToEdit.icao = icao.uppercased().trimmingCharacters(in: .whitespaces)

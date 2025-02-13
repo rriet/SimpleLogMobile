@@ -20,12 +20,16 @@ struct AddEditFlight: View {
     @Binding var flightToEdit: Flight?
     
     @State private var aircraft: Aircraft? = nil
+    @State private var airportDep: Airport? = nil
+    @State private var airportArr: Airport? = nil
     @State private var dateStart: Date = Date()
     @State private var dateTakeOff: Date = Date()
     @State private var dateLanding: Date = Date()
     @State private var dateEnd: Date = Date()
     @State private var timeBlock: Int16 = 0
     @State private var isLocked: Bool = false
+    @State private var pfTakeOff: Bool = false
+    @State private var pfLanding: Bool = false
     @State private var takeoffDay: Int16 = 0
     @State private var takeoffNight: Int16 = 0
     @State private var landingDay: Int16 = 0
@@ -59,48 +63,89 @@ struct AddEditFlight: View {
     var body: some View {
         NavigationStack {
             Form {
-                VStack {
+                Section {
                     InputDate(
                         title: "Date",
                         dateStart: $dateStart
                     )
-                    
-                    DatePicker(
-                        "Test",
-                        selection: $dateStart,
-                        displayedComponents: .hourAndMinute
-                    )
-                    
-                    InputHour(
-                        date: $dateStart,
-                        mode: AppSettings.hourInputMode,
-                        title: "Block Off"
-                    )
-                    
-                    if AppSettings.logTakeOffAndLanding {
-                        InputHour(
-                            date: $dateTakeOff,
-                            mode: AppSettings.hourInputMode,
-                            title: "Take Off"
-                        )
-                        
-                        InputHour(
-                            date: $dateLanding,
-                            mode: AppSettings.hourInputMode,
-                            title: "Landing"
-                        )
-                    }
-                    
-                    InputHour(
-                        date: $dateEnd,
-                        mode: AppSettings.hourInputMode,
-                        title: "Block In"
-                    )
-                    
                 }
+                .listRowInsets(EdgeInsets(top: 15, leading: 10, bottom: 15, trailing: 10))
                 
+                Section ("Departure") {
+                    VStack(alignment: .leading, spacing: 5) {
+                        
+                        AirportInputLine(airport: $airportDep)
+                        
+                        HStack{
+                            InputHour(
+                                date: $dateStart,
+                                mode: AppSettings.hourInputMode,
+                                title: "Block Off"
+                            )
+                            
+                            if AppSettings.logTakeOffAndLanding {
+                                Spacer()
+                                InputHour(
+                                    date: $dateTakeOff,
+                                    mode: AppSettings.hourInputMode,
+                                    title: "Take Off"
+                                )
+                            } else {
+                                Toggle(isOn: $pfTakeOff) {
+                                    Text("Pilot Flying")
+                                }
+                                .padding(.leading, 30)
+                            }
+                        }
+                        
+                        if AppSettings.logTakeOffAndLanding {
+                            Toggle(isOn: $pfTakeOff) {
+                                Text("Pilot Flying")
+                            }
+                            .frame(width: 160)
+                        }
+                    }
+                }
+                .listRowInsets(EdgeInsets(top: 15, leading: 10, bottom: 15, trailing: 10))
+                    
+                Section("Arrival") {
+                    VStack(alignment: .leading, spacing: 5) {
+                        AirportInputLine(airport: $airportArr)
+                        
+                        HStack {
+                            if AppSettings.logTakeOffAndLanding {
+                                InputHour(
+                                    date: $dateLanding,
+                                    mode: AppSettings.hourInputMode,
+                                    title: "Landing"
+                                )
+                                Spacer()
+                            }
+                            
+                            InputHour(
+                                date: $dateEnd,
+                                mode: AppSettings.hourInputMode,
+                                title: "Block In"
+                            )
+                            
+                            if !AppSettings.logTakeOffAndLanding {
+                                Toggle(isOn: $pfLanding) {
+                                    Text("Pilot Flying")
+                                }
+                                .padding(.leading, 30)
+                            }
+                        }
+                        if AppSettings.logTakeOffAndLanding {
+                            Toggle(isOn: $pfLanding) {
+                                Text("Pilot Flying")
+                            }
+                            .frame(width: 160)
+                        }
+                    }
+                }
+                .listRowInsets(EdgeInsets(top: 15, leading: 10, bottom: 15, trailing: 10))
                 
-                Section(header: Text("")) {
+                Section {
                     HStack{
                         VStack (alignment: .trailing) {
                             Picker("Aircraft:", selection: $aircraft) {

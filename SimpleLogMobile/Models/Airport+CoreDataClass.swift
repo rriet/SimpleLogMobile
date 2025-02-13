@@ -55,4 +55,8 @@ public class Airport: NSManagedObject, SwipeableItem, Comparable {
     var positioningArray: [Positioning] {
         return (positioningArrivingArray + positioningArrivingArray).sorted()
     }
+    
+    var toString: String {
+        "\(self.icao ?? "")\(self.iata != nil && !self.iata!.isEmpty ? "/\(self.iata!)" : "") \(self.name ?? "")"
+    }
 }
