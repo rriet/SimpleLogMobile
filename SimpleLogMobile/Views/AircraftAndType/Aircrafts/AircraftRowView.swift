@@ -14,6 +14,7 @@ struct AircraftRowView: View {
     let onEdit: () -> Void
     let onTapGesture: () -> Void
     let onToggleLock: () -> Void
+    let onToggleFavorite: () -> Void
     
     var body: some View {
         HStack{
@@ -41,31 +42,13 @@ struct AircraftRowView: View {
                     .font(.caption)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
+            Button(action: onToggleFavorite) {
+                Image(systemName: aircraft.isFavorite ? "star.fill" : "star")
+                    .foregroundColor(aircraft.isFavorite ? .yellow : .gray)
+                    .padding(.trailing, 8)
+            }
+            .buttonStyle(BorderlessButtonStyle())
         }
-//        VStack(alignment: .leading) {
-//            HStack{
-//                Text("Registration: ")
-//                Text(aircraft.registration.strUnwrap)
-//                    .font(.headline)
-//                    .fontWeight(.bold)
-//                Text(aircraft.isSimulator ? "[Simulator]" : "")
-//                    .padding(.leading, 10)
-//                    .font(.caption)
-//            }
-//            .lineLimit(1)
-//            .frame(maxWidth: .infinity, alignment: .leading)
-//            Text("Type: \(aircraft.aircraftType?.designator ?? "")")
-//                .lineLimit(1)
-//                .font(.caption)
-//                .frame(maxWidth: .infinity, alignment: .leading)
-//                .padding(.leading, 20)
-//            Text("MTOW: \(aircraft.mtowString)")
-//                .lineLimit(1)
-//                .font(.caption)
-//                .frame(maxWidth: .infinity, alignment: .leading)
-//                .padding(.leading, 20)
-//            
-//        }
         .frame(maxWidth: .infinity)
         .clipped()
         .listRowBackground(Color.theme.background)

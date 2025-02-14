@@ -23,6 +23,7 @@ struct AddEditAircraftView: View {
     @State private var istMtowInvalid: Bool = false
     @State private var isSimulator: Bool = false
     @State private var selectedType: AircraftType?
+    @State private var isFavorite: Bool = false
     
     
     @State private var showAddTypeSheet = false
@@ -81,6 +82,10 @@ struct AddEditAircraftView: View {
                     }
                     .buttonStyle(.bordered)
                 }
+                Toggle(isOn: $isFavorite) {
+                    Text("Favorite")
+                        .font(.title2)
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -122,6 +127,7 @@ struct AddEditAircraftView: View {
         aircraftMtow = String(receivedAircraft.aircraftMtow)
         isSimulator = receivedAircraft.isSimulator
         selectedType = receivedAircraft.aircraftType
+        isFavorite = receivedAircraft.isFavorite
     }
     
     private func changeIsSimulator() {
@@ -148,7 +154,8 @@ struct AddEditAircraftView: View {
                             registration: registration,
                             aircraftMtow: aircraftMtow,
                             aircraftType: typeUnwraped,
-                            isSimulator: isSimulator
+                            isSimulator: isSimulator,
+                            isFavorite: isFavorite
                         )
                 } else {
                     // Editing an existing aircraft type
@@ -157,7 +164,8 @@ struct AddEditAircraftView: View {
                         registration: registration,
                         aircraftMtow: aircraftMtow,
                         aircraftType: typeUnwraped,
-                        isSimulator: isSimulator
+                        isSimulator: isSimulator,
+                        isFavorite: isFavorite
                     )
                 }
                 try aircraftVM.fetchAircraftList()

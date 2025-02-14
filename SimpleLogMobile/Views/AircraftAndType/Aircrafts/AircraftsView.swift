@@ -14,9 +14,21 @@ struct AircraftsView: View {
     @ObservedObject private var aircraftVM = AircraftViewModel()
     
     var groupedAircrafts: [String: [Aircraft]] {
-        Dictionary(
+        // Get favorite aircrafts
+        let favoriteAircrafts = aircraftVM.aircraftList.filter { $0.isFavorite }
+
+        var sortedGrouped: [String: [Aircraft]] = [:]
+        if !favoriteAircrafts.isEmpty {
+            sortedGrouped["Favorites"] = favoriteAircrafts
+        }
+        
+        let grouped = Dictionary(
             grouping: aircraftVM.aircraftList,
             by: {$0.aircraftType?.designatorUnwrapped ?? ""})
+        
+        sortedGrouped.merge(grouped) { current, _ in current }
+
+        return sortedGrouped
     }
     
     @State private var selectedAircraft: Aircraft?
@@ -27,8 +39,12 @@ struct AircraftsView: View {
         VStack {
             if !groupedAircrafts.isEmpty {
                 List {
-                    ForEach(groupedAircrafts.keys.sorted(), id: \.self) { groupName in
-                        Section(header: Text("Type: \(groupName)")){
+                    ForEach(groupedAircrafts.keys.sorted{ (key1, key2) -> Bool in
+                        if key1 == "Favorites" { return true }
+                        if key2 == "Favorites" { return false }
+                        return key1 < key2
+                    }, id: \.self) { groupName in
+                        Section(header: Text(groupName == "Favorites" ? groupName : "Type: \(groupName)")){
                             ForEach(groupedAircrafts[groupName] ?? [], id: \.self) { aircraft in
                                 AircraftRowView(
                                     aircraft: aircraft,
@@ -43,14 +59,23 @@ struct AircraftsView: View {
                                     },
                                     onToggleLock: {
                                         try! aircraftVM.toggleLocked(aircraft)
+                                    },
+                                    onToggleFavorite: {
+                                        try! aircraftVM.toggleFavorite(aircraft)
                                     })
                             }
                         }
                     }
+                    // Spacer to allow last entry to scroll pass the + button
+                    Section {
+                        Spacer()
+                            .frame(height: 100)
+                            .listRowBackground(Color.clear)
+                    }
                 }
                 .listSectionSpacing(5)
             } else {
-                Text("No Aircraft to display.\nPress the \"Plus\" button to create a new Aircraft.")
+                Text("No Aircrafts to yet.")
                     .font(.subheadline)
                     .foregroundColor(Color.theme.foreground)
                     .frame(

@@ -19,8 +19,9 @@ class AircraftViewModel: ObservableObject {
     
     func fetchAircraftList() throws {
         let request = Aircraft.fetchRequest()
-        let sort = NSSortDescriptor(key: "registration", ascending: true)
-        request.sortDescriptors = [sort]
+        let sortStar = NSSortDescriptor(key: "isFavorite", ascending: false)
+        let sortRegistration = NSSortDescriptor(key: "registration", ascending: true)
+        request.sortDescriptors = [sortStar, sortRegistration]
         
         do {
             aircraftList = try viewContext.fetch(request)
@@ -35,8 +36,10 @@ class AircraftViewModel: ObservableObject {
         registration: String,
         aircraftMtow: String,
         aircraftType: AircraftType,
-        isSimulator: Bool
+        isSimulator: Bool,
+        isFavorite: Bool = false
     ) throws {
+        
         let newAircraft = Aircraft(context: viewContext)
         
         let isLocked = AppSettings.autoLockNewEntries
@@ -47,7 +50,8 @@ class AircraftViewModel: ObservableObject {
             aircraftMtow: aircraftMtow,
             aircraftType: aircraftType,
             isSimulator: isSimulator,
-            isLocked: isLocked
+            isLocked: isLocked,
+            isFavorite: isFavorite
         )
     }
     
@@ -57,7 +61,8 @@ class AircraftViewModel: ObservableObject {
         aircraftMtow: String,
         aircraftType: AircraftType,
         isSimulator: Bool,
-        isLocked: Bool = false
+        isLocked: Bool = false,
+        isFavorite: Bool = false
     ) throws {
         
         if registration.count < 3 {
@@ -71,6 +76,7 @@ class AircraftViewModel: ObservableObject {
         aircraftToEdit.aircraftType = aircraftType
         aircraftToEdit.isSimulator = isSimulator
         aircraftToEdit.isLocked = isLocked
+        aircraftToEdit.isFavorite = isFavorite
         
         try save()
     }
@@ -116,6 +122,23 @@ class AircraftViewModel: ObservableObject {
     
     func toggleLocked(_ typeToToggle: Aircraft) throws {
         typeToToggle.isLocked.toggle()
+        try save()
+    }
+    
+    func toggleFavorite(_ aircraftToToggle: Aircraft) throws {
+        aircraftToToggle.isFavorite.toggle()
+        
+        // reorder display array
+        aircraftList = aircraftList.sorted {
+            // First, compare by isFavorite (true first)
+            if $0.isFavorite != $1.isFavorite {
+                return $0.isFavorite && !$1.isFavorite
+            }
+            
+            // If isFavorite is the same, then compare by icao
+            return $0.registration ?? "" < $1.registration ?? ""
+        }
+        
         try save()
     }
     
