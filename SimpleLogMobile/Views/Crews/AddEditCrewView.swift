@@ -22,6 +22,7 @@ struct AddEditCrewView: View {
     @State private var email: String = ""
     @State private var notes: String = ""
     @State private var picture: Data? = nil
+    @State private var isFavorite: Bool = false
     
     @State private var showImagePickerOptions = false
     @State private var showImagePicker = false
@@ -100,6 +101,11 @@ struct AddEditCrewView: View {
                     capitalization: .sentences
                 )
                 
+                Toggle(isOn: $isFavorite) {
+                    Text("Favorite")
+                        .font(.title2)
+                }
+                
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -145,6 +151,7 @@ struct AddEditCrewView: View {
         phone = receivedCrew.phone.strUnwrap
         notes = receivedCrew.notes.strUnwrap
         picture = receivedCrew.picture
+        isFavorite = receivedCrew.isFavorite
         
     }
     
@@ -187,7 +194,8 @@ struct AddEditCrewView: View {
                     email: email,
                     phone: phone,
                     notes: notes,
-                    picture: picture
+                    picture: picture,
+                    isFavorite: isFavorite
                     )
             } else {
                 // Editing an existing aircraft type
@@ -197,7 +205,8 @@ struct AddEditCrewView: View {
                     email: email,
                     phone: phone,
                     notes: notes,
-                    picture: picture
+                    picture: picture,
+                    isFavorite: isFavorite
                 )
             }
             try crewVM.fetchCrewList()

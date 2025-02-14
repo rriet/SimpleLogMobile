@@ -16,10 +16,22 @@ struct CrewsView: View {
     @State private var filteredCrewList: [Crew] = []
     
     var groupedFilteredCrewList: [String: [Crew]] {
-        Dictionary(grouping: filteredCrewList) { crew in
+        // Get favorite aircrafts
+        let favoriteCrews = crewVM.crewList.filter { $0.isFavorite }
+
+        var sortedCrew: [String: [Crew]] = [:]
+        if !favoriteCrews.isEmpty {
+            sortedCrew["Favorites"] = favoriteCrews
+        }
+        
+        let groupedCrew = Dictionary(grouping: filteredCrewList) { crew in
             guard let name = crew.name, !name.isEmpty else { return "" }
             return String(name.prefix(1)).uppercased()
         }
+        
+        sortedCrew.merge(groupedCrew) { current, _ in current }
+
+        return sortedCrew
     }
     
     @State private var selectedCrew: Crew?
@@ -47,7 +59,11 @@ struct CrewsView: View {
                     .padding(.horizontal)
                     if !filteredCrewList.isEmpty {
                         List {
-                            ForEach(groupedFilteredCrewList.keys.sorted(), id: \.self) { fistLetter in
+                            ForEach(groupedFilteredCrewList.keys.sorted{ (key1, key2) -> Bool in
+                                if key1 == "Favorites" { return true }
+                                if key2 == "Favorites" { return false }
+                                return key1 < key2
+                            }, id: \.self) { fistLetter in
                                 Section(header: Text(fistLetter)) {
                                     ForEach(groupedFilteredCrewList[fistLetter] ?? [], id: \.self) { crew in
                                         CrewRowView(
@@ -67,6 +83,9 @@ struct CrewsView: View {
                                             onImageTapGesture: {
                                                 selectedCrew = crew
                                                 showLargeImage = true
+                                            },
+                                            onToggleFavorite: {
+                                                try! crewVM.toggleFavorite(crew)
                                             })
                                     }
                                 }
@@ -158,6 +177,9 @@ struct CrewsView: View {
     private func filterCrewList() {
         if searchText.isEmpty {
             filteredCrewList = crewVM.crewList
+            if (filteredCrewList.isEmpty) {
+                try! crewVM.addCrew(name: "Self")
+            }
         } else {
             filteredCrewList = crewVM.crewList.filter { crew in
                 crew.name.strUnwrap.localizedCaseInsensitiveContains(searchText) ||

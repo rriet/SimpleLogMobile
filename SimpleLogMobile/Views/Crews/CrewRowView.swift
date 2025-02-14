@@ -15,6 +15,7 @@ struct CrewRowView: View {
     let onTapGesture: () -> Void
     let onToggleLock: () -> Void
     let onImageTapGesture: () -> Void
+    let onToggleFavorite: () -> Void
 
     var body: some View {
         HStack{
@@ -64,6 +65,13 @@ struct CrewRowView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .contentShape(Rectangle())
             .onTapGesture {onTapGesture()}
+            
+            Button(action: onToggleFavorite) {
+                Image(systemName: crew.isFavorite ? "star.fill" : "star")
+                    .foregroundColor(crew.isFavorite ? .yellow : .gray)
+                    .padding(.trailing, 8)
+            }
+            .buttonStyle(BorderlessButtonStyle())
             
         }
         .frame(maxWidth: .infinity, minHeight: 70)

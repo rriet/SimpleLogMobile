@@ -36,7 +36,8 @@ class CrewViewModel: ObservableObject {
         email: String = "",
         phone: String = "",
         notes: String = "",
-        picture: Data? = nil
+        picture: Data? = nil,
+        isFavorite: Bool = false
     ) throws {
         let newCrew = Crew(context: viewContext)
         
@@ -48,7 +49,8 @@ class CrewViewModel: ObservableObject {
                      phone: phone,
                      notes: notes,
                      picture: picture,
-                     isLocked: isLocked)
+                     isLocked: isLocked,
+                     isFavorite: isFavorite)
     }
     
     func editCrew(_ crewToEdit: Crew,
@@ -57,7 +59,8 @@ class CrewViewModel: ObservableObject {
                   phone: String = "",
                   notes: String = "",
                   picture: Data? = nil,
-                  isLocked: Bool = false
+                  isLocked: Bool = false,
+                  isFavorite: Bool = false
     ) throws {
         
         if name.count < 3 {
@@ -72,6 +75,7 @@ class CrewViewModel: ObservableObject {
         crewToEdit.notes = notes
         crewToEdit.picture = picture
         crewToEdit.isLocked = isLocked
+        crewToEdit.isFavorite = isFavorite
         
         try save()
     }
@@ -116,6 +120,23 @@ class CrewViewModel: ObservableObject {
     
     func toggleLocked(_ crewToToggle: Crew) throws {
         crewToToggle.isLocked.toggle()
+        try save()
+    }
+    
+    func toggleFavorite(_ crewToToggle: Crew) throws {
+        crewToToggle.isFavorite.toggle()
+        
+        // reorder display array
+        crewList = crewList.sorted {
+            // First, compare by isFavorite (true first)
+            if $0.isFavorite != $1.isFavorite {
+                return $0.isFavorite && !$1.isFavorite
+            }
+            
+            // If isFavorite is the same, then compare by icao
+            return $0.name ?? "" < $1.name ?? ""
+        }
+        
         try save()
     }
     
