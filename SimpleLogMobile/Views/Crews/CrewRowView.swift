@@ -44,6 +44,7 @@ struct CrewRowView: View {
                 Text(crew.name.strUnwrap)
                     .lineLimit(1)
                     .font(.headline)
+                    .minimumScaleFactor(0.8)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top)
                 if !crew.phone.strUnwrap.isEmpty {

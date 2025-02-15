@@ -18,25 +18,26 @@ struct AirportInputLine: View {
         HStack {
             Text("Airport")
             if let selectedAirport = airport {
-                Text(selectedAirport.toString)
-                    .minimumScaleFactor(0.7)
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 5)
-                    .frame(height: 35)
-                    .background(Color.theme.secondaryBackground)
-                    .cornerRadius(7)
+                Button {
+                    onTapGesture()
+                } label: {
+                    Text(selectedAirport.toString)
+                        .minimumScaleFactor(0.7)
+                        .lineLimit(1)
+                }
+                .buttonStyle(.bordered)
             } else {
-                Text("Click to select an airport")
-                    .lineLimit(1)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.leading, 5)
-                    .frame(height: 35)
-                    .background(Color.theme.secondaryBackground)
-                    .cornerRadius(7)
+                Button {
+                    onTapGesture()
+                } label: {
+                    Text("Click to select an airport")
+                        .lineLimit(1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .buttonStyle(.bordered)
+                
             }
         }
-        .onTapGesture {onTapGesture()}
         .sheet(isPresented: $showAirportSelector) {
             AirportSelector(airport: $airport)
         }

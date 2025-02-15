@@ -50,6 +50,7 @@ struct CrewsView: View {
                     HStack {
                         Text("Search:")
                         TextField("Search", text: $searchText)
+                            .autocorrectionDisabled(true)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
                             .padding(.horizontal)
                             .onChange(of: searchText) { oldValue , newValue in

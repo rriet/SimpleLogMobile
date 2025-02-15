@@ -53,6 +53,9 @@ struct AddEditFlight: View {
     @State private var remarks: String = ""
     @State private var notes: String = ""
     
+    @State private var count: Int16 = 5
+    @State private var showCrewDropdown: Bool = false
+    
     @StateObject var alertManager = AlertManager()
     
     init(_ flight: Binding<Flight?>, timelineVM: TimelineViewModel) {
@@ -68,6 +71,105 @@ struct AddEditFlight: View {
                         title: "Date",
                         dateStart: $dateStart
                     )
+                    HStack {
+                        AirportInputLine(airport: $airportDep)
+                        Button {
+                            showCrewDropdown.toggle()
+                        } label: {
+                            HStack {
+                                Text("Crew")
+                                Image(systemName: showCrewDropdown ? "chevron.up" : "chevron.down")
+                                    .font(.system(size: 15, weight: .bold))
+                                    .animation(nil, value: showCrewDropdown)
+                            }
+                            
+                                .frame(width: 80, height: 20)
+                                .overlay(
+                                    ZStack {
+                                        if count > 0 {
+                                            Text("\(count)")
+                                                .font(.caption)
+                                                .foregroundColor(.white)
+                                                .padding(6)
+                                                .background(Color.red)
+                                                .clipShape(Circle())
+                                                .offset(x: 17, y: -15)
+                                        }
+                                    },
+                                        alignment: .topTrailing
+                                )
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    
+                    if showCrewDropdown {
+                        VStack {
+                            Button {
+                                showCrewDropdown.toggle()
+                            } label: {
+                                Text("Add Crew Member")
+                            }
+                            .buttonStyle(.bordered)
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            
+                            Grid(alignment: .centerFirstTextBaseline,
+                                 horizontalSpacing: 1,
+                                 verticalSpacing: 5) {
+                                GridRow {
+                                    Text("Fernando Brito Riet Correa (RBRI)")
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .minimumScaleFactor(0.8)
+                                    Text("Captain")
+                                        .font(.caption)
+                                    Button {
+                                        showCrewDropdown.toggle()
+                                    } label: {
+                                        Image(systemName: "person.badge.minus")
+                                            .font(.system(size: 15, weight: .bold))
+                                    }
+                                    .padding(6)
+                                    .buttonStyle(.bordered)
+                                    .foregroundColor(.red)
+                                }
+                                
+                                GridRow {
+                                    Text("Self")
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    Text("First Officer")
+                                        .font(.caption)
+                                    Button {
+                                        showCrewDropdown.toggle()
+                                    } label: {
+                                        Image(systemName: "person.badge.minus")
+                                            .font(.system(size: 15, weight: .bold))
+                                    }
+                                    .padding(6)
+                                    .buttonStyle(.bordered)
+                                    .foregroundColor(.red)
+                                }
+                                
+                                GridRow {
+                                    Text("Rafael Mendez")
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    Text("Line instructor")
+                                        .font(.caption)
+                                    Button {
+                                        showCrewDropdown.toggle()
+                                    } label: {
+                                        Image(systemName: "person.badge.minus")
+                                            .font(.system(size: 15, weight: .bold))
+                                    }
+                                    .padding(6)
+                                    .buttonStyle(.bordered)
+                                    .foregroundColor(.red)
+                                }
+                                
+                            }
+                                 .font(.headline)
+                                 .lineLimit(1)
+                            
+                        }
+                    }
                 }
                 .listRowInsets(EdgeInsets(top: 15, leading: 10, bottom: 15, trailing: 10))
                 
@@ -145,51 +247,51 @@ struct AddEditFlight: View {
                 }
                 .listRowInsets(EdgeInsets(top: 15, leading: 10, bottom: 15, trailing: 10))
                 
-                Section {
-                    HStack{
-                        VStack (alignment: .trailing) {
-                            Picker("Aircraft:", selection: $aircraft) {
-                                Text("Select one").tag(nil as Aircraft?) // Tag for the "none" option
-                                ForEach(aircraftVM.aircraftList) { acft in
-                                    Text(acft.registration.strUnwrap).tag(acft as Aircraft?)
-                                }
-                            }
-                            
-                            if aircraft == nil {
-                                Text("Required!")
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                            }
-                        }
-                        Text("Type: \(aircraft?.aircraftType?.designator.strUnwrap ?? "")")
-                            .frame(maxWidth: .infinity)
-                    }
-                    HStack{
-                        VStack (alignment: .trailing) {
-                            Picker("Aircraft:", selection: $aircraft) {
-                                Text("Select one").tag(nil as Aircraft?) // Tag for the "none" option
-                                ForEach(aircraftVM.aircraftList) { acft in
-                                    Text(acft.registration.strUnwrap).tag(acft as Aircraft?)
-                                }
-                            }
-                            
-                            if aircraft == nil {
-                                Text("Required!")
-                                    .font(.caption)
-                                    .foregroundColor(.red)
-                            }
-                        }
-                        Text("Type: \(aircraft?.aircraftType?.designator.strUnwrap ?? "")")
-                            .frame(maxWidth: .infinity)
-                    }
-                }
-                
-                Section(header: Text("Takeoff & Landing")) {
-                    Stepper("Takeoff Day: \(takeoffDay)", value: $takeoffDay)
-                    Stepper("Takeoff Night: \(takeoffNight)", value: $takeoffNight)
-                    Stepper("Landing Day: \(landingDay)", value: $landingDay)
-                    Stepper("Landing Night: \(landingNight)", value: $landingNight)
-                }
+//                Section {
+//                    HStack{
+//                        VStack (alignment: .trailing) {
+//                            Picker("Aircraft:", selection: $aircraft) {
+//                                Text("Select one").tag(nil as Aircraft?) // Tag for the "none" option
+//                                ForEach(aircraftVM.aircraftList) { acft in
+//                                    Text(acft.registration.strUnwrap).tag(acft as Aircraft?)
+//                                }
+//                            }
+//                            
+//                            if aircraft == nil {
+//                                Text("Required!")
+//                                    .font(.caption)
+//                                    .foregroundColor(.red)
+//                            }
+//                        }
+//                        Text("Type: \(aircraft?.aircraftType?.designator.strUnwrap ?? "")")
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                    HStack{
+//                        VStack (alignment: .trailing) {
+//                            Picker("Aircraft:", selection: $aircraft) {
+//                                Text("Select one").tag(nil as Aircraft?) // Tag for the "none" option
+//                                ForEach(aircraftVM.aircraftList) { acft in
+//                                    Text(acft.registration.strUnwrap).tag(acft as Aircraft?)
+//                                }
+//                            }
+//                            
+//                            if aircraft == nil {
+//                                Text("Required!")
+//                                    .font(.caption)
+//                                    .foregroundColor(.red)
+//                            }
+//                        }
+//                        Text("Type: \(aircraft?.aircraftType?.designator.strUnwrap ?? "")")
+//                            .frame(maxWidth: .infinity)
+//                    }
+//                }
+//                
+//                Section(header: Text("Takeoff & Landing")) {
+//                    Stepper("Takeoff Day: \(takeoffDay)", value: $takeoffDay)
+//                    Stepper("Takeoff Night: \(takeoffNight)", value: $takeoffNight)
+//                    Stepper("Landing Day: \(landingDay)", value: $landingDay)
+//                    Stepper("Landing Night: \(landingNight)", value: $landingNight)
+//                }
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

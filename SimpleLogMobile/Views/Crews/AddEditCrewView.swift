@@ -73,7 +73,6 @@ struct AddEditCrewView: View {
                     textValue: $name,
                     isInvalid: $isNameInvalid,
                     isRequired: true,
-                    minLength: 3,
                     capitalization: .words,
                     customValidation: { input in
                         checkExists(name: input)

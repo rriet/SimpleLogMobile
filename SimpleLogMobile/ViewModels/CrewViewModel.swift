@@ -63,10 +63,10 @@ class CrewViewModel: ObservableObject {
                   isFavorite: Bool = false
     ) throws {
         
-        if name.count < 3 {
+        if name.count < 1 {
             throw ErrorDetails(
                 title: "Invalid Name",
-                message: "Crew Name must be at least 3 characters long.")
+                message: "Crew Name must be at least 1 characters long.")
         }
         
         crewToEdit.name = name.trimmingCharacters(in: .whitespaces)
@@ -92,6 +92,21 @@ class CrewViewModel: ObservableObject {
             throw ErrorDetails(
                 title: "Error!",
                 message: "There was an unknown error reading from database.")
+        }
+    }
+    
+    func getCrew(_ name: String) throws -> Crew? {
+        let request = Crew.fetchRequest()
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "name ==[c] %@", name)
+
+        do {
+            let result = try viewContext.fetch(request)
+            return result.first // Return the first matched aircraft
+        } catch {
+            throw ErrorDetails(
+                title: "Error!",
+                message: "There was an unknown error reading from the database.")
         }
     }
     

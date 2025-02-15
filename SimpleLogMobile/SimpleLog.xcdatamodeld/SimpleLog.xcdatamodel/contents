@@ -48,7 +48,7 @@
         <attribute name="notes" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="phone" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="picture" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
-        <relationship name="flights" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="crewMembers" inverseEntity="Flight"/>
+        <relationship name="flightCrew" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FlightCrew" inverseName="crew" inverseEntity="FlightCrew"/>
         <relationship name="simTrainings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SimulatorTraining" inverseName="crew" inverseEntity="SimulatorTraining"/>
     </entity>
     <entity name="DutyPeriod" representedClassName="DutyPeriod" syncable="YES" codeGenerationType="category">
@@ -88,8 +88,13 @@
         <relationship name="aircraft" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="flights" inverseEntity="Aircraft"/>
         <relationship name="airportArr" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsArriving" inverseEntity="Airport"/>
         <relationship name="airportDep" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsDeparting" inverseEntity="Airport"/>
-        <relationship name="crewMembers" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Crew" inverseName="flights" inverseEntity="Crew"/>
+        <relationship name="flightCrew" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FlightCrew" inverseName="flight" inverseEntity="FlightCrew"/>
         <relationship name="startTimeline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="flightStart" inverseEntity="Timeline"/>
+    </entity>
+    <entity name="FlightCrew" representedClassName="FlightCrew" syncable="YES" codeGenerationType="category">
+        <attribute name="position" optional="YES" attributeType="String"/>
+        <relationship name="crew" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Crew" inverseName="flightCrew" inverseEntity="Crew"/>
+        <relationship name="flight" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Flight" inverseName="flightCrew" inverseEntity="Flight"/>
     </entity>
     <entity name="Positioning" representedClassName="Positioning" syncable="YES" codeGenerationType="category">
         <attribute name="dateEnd" attributeType="Date" usesScalarValueType="NO"/>

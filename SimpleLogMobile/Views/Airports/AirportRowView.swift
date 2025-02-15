@@ -50,6 +50,7 @@ struct AirportRowView: View {
                 }
             }
                  .lineLimit(1)
+                 .minimumScaleFactor(0.8)
                  .clipped()
                  .font(.caption)
                  .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)

@@ -84,7 +84,8 @@ struct TimelineView: View {
 //                            try! timelineVM.fetchTimelineList()
                         }
                         Button("Duty") {
-                            try! importAirports()
+//                            try! AirportImporter()
+                            try! FlightImporter()
                         }
                         Button("Simulator") { }
                         Button("Positioning") { }

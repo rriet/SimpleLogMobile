@@ -7,18 +7,7 @@
 
 import Foundation
 
-// Define a Codable struct for decoding the JSON data
-//struct AirportImport: Codable {
-//    let icao: String
-//    let iata: String
-//    let name: String
-//    let city: String
-//    let country: String
-//    let latitude: String
-//    let longitude: String
-//}
-
-func importAirports() throws {
+func AirportImporter() throws {
     
     let airportVM = AirportViewModel()
     
@@ -40,7 +29,7 @@ func importAirports() throws {
             let latitude = Double(row[5]) ?? 0.0
             let longitude = Double(row[6]) ?? 0.0
             
-            try airportVM.addAirport(
+            try _ = airportVM.addAirport(
                 icao: icao,
                 iata: iata,
                 name: name,
@@ -51,24 +40,4 @@ func importAirports() throws {
             )
         }
     }
-}
-
-func parseCSV(from fileURL: URL) throws -> [[String]] {
-    // Read the CSV file as a string
-    let content = try String(contentsOf: fileURL)
-    
-    // Split the content into rows (lines)
-    let rows = content.components(separatedBy: "\n").filter { !$0.isEmpty }
-    
-    let parsedData = rows.map { row in
-        // Remove surrounding quotes from each field and split by commas
-        row.split(separator: ",").map { field in
-            field.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
-        }
-    }
-    
-    // Parse each row into columns, considering commas as separators
-//    let parsedData2 = rows.map { $0.components(separatedBy: ",") }
-    
-    return parsedData
 }

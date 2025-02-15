@@ -148,6 +148,21 @@ class AircraftTypeViewModel: ObservableObject {
         }   
     }
     
+    func getAircraftType(_ designator: String) throws -> AircraftType? {
+        let request = AircraftType.fetchRequest()
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "designator ==[c] %@", designator)
+
+        do {
+            let result = try viewContext.fetch(request)
+            return result.first // Return the first matched aircraft
+        } catch {
+            throw ErrorDetails(
+                title: "Error!",
+                message: "There was an unknown error reading from the database.")
+        }
+    }
+    
     func checkTypeDesignator (_ designator: String) throws {
         if designator.count < 3 {
             throw ErrorDetails(

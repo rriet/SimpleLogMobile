@@ -147,6 +147,21 @@ class AirportViewModel: ObservableObject {
         }
     }
     
+    func getAirport(_ icao: String) throws -> Airport? {
+        let request = Airport.fetchRequest()
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "icao ==[c] %@", icao)
+
+        do {
+            let result = try viewContext.fetch(request)
+            return result.first // Return the first matched aircraft
+        } catch {
+            throw ErrorDetails(
+                title: "Error!",
+                message: "There was an unknown error reading from the database.")
+        }
+    }
+    
     func deleteAirport(_ airportToDelete: Airport) throws {
         guard !airportToDelete.isLocked else {
             throw ErrorDetails(

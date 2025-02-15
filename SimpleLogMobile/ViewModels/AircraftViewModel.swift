@@ -96,6 +96,21 @@ class AircraftViewModel: ObservableObject {
         }
     }
     
+    func getAircraft(_ registration: String) throws -> Aircraft? {
+        let request = Aircraft.fetchRequest()
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "registration ==[c] %@", registration)
+
+        do {
+            let result = try viewContext.fetch(request)
+            return result.first // Return the first matched aircraft
+        } catch {
+            throw ErrorDetails(
+                title: "Error!",
+                message: "There was an unknown error reading from the database.")
+        }
+    }
+    
     func deleteAircraft(_ aircraftToDelete: Aircraft) throws {
         
         guard !aircraftToDelete.isLocked else {
