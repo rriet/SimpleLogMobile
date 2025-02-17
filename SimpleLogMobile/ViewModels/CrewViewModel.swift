@@ -13,10 +13,6 @@ class CrewViewModel: ObservableObject {
     private let viewContext = PersistenceController.shared.viewContext
     @Published var crewList: [Crew] = []
     
-    init() {
-        try? fetchCrewList()
-    }
-    
     func fetchCrewList() throws {
         let request = Crew.fetchRequest()
         let sort = NSSortDescriptor(key: "name", ascending: true)
@@ -32,51 +28,34 @@ class CrewViewModel: ObservableObject {
     }
     
     func addCrew(
-        name: String = "",
-        email: String = "",
-        phone: String = "",
-        notes: String = "",
-        picture: Data? = nil,
-        isFavorite: Bool = false
+        _ crewData: CrewModel
     ) throws {
+        
+        if try checkExist(crewData.name) {
+            throw ErrorDetails(
+                title: "Error!",
+                message: "Crew already exist.")
+        }
+        
         let newCrew = Crew(context: viewContext)
-        
-        let isLocked = AppSettings.autoLockNewEntries
-        
-        try editCrew(newCrew,
-                     name: name,
-                     email: email,
-                     phone: phone,
-                     notes: notes,
-                     picture: picture,
-                     isLocked: isLocked,
-                     isFavorite: isFavorite)
+        try editCrew(newCrew, newCrew: crewData)
     }
     
-    func editCrew(_ crewToEdit: Crew,
-                  name: String = "",
-                  email: String = "",
-                  phone: String = "",
-                  notes: String = "",
-                  picture: Data? = nil,
-                  isLocked: Bool = false,
-                  isFavorite: Bool = false
+    func editCrew(_ crew: Crew, newCrew: CrewModel
     ) throws {
         
-        if name.count < 1 {
+        if !newCrew.isValid {
             throw ErrorDetails(
                 title: "Invalid Name",
                 message: "Crew Name must be at least 1 characters long.")
         }
         
-        crewToEdit.name = name.trimmingCharacters(in: .whitespaces)
-        crewToEdit.email = email.trimmingCharacters(in: .whitespaces)
-        crewToEdit.phone = phone.trimmingCharacters(in: .whitespaces)
-        crewToEdit.notes = notes
-        crewToEdit.picture = picture
-        crewToEdit.isLocked = isLocked
-        crewToEdit.isFavorite = isFavorite
-        
+        let mirror = Mirror(reflecting: newCrew)
+        for property in mirror.children {
+            if let key = property.label {
+                crew.setValue(property.value, forKey: key)
+            }
+        }
         try save()
     }
     

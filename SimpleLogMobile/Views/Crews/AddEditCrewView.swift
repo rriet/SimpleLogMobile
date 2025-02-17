@@ -14,15 +14,13 @@ struct AddEditCrewView: View {
     
     var crewVM: CrewViewModel
     
+    // Crew from the database or nil
     @Binding var crewToEdit: Crew?
     
-    @State private var name: String = ""
+    // Displayed crew model
+    @State private var crew = CrewModel()
+    
     @State private var isNameInvalid: Bool = false
-    @State private var phone: String = ""
-    @State private var email: String = ""
-    @State private var notes: String = ""
-    @State private var picture: Data? = nil
-    @State private var isFavorite: Bool = false
     
     @State private var showImagePickerOptions = false
     @State private var showImagePicker = false
@@ -30,8 +28,8 @@ struct AddEditCrewView: View {
     @StateObject var alertManager = AlertManager()
     
     init(_ crew: Binding<Crew?>, crewVM: CrewViewModel) {
-        self.crewVM = crewVM
         self._crewToEdit = crew
+        self.crewVM = crewVM
     }
     
     var body: some View {
@@ -39,7 +37,7 @@ struct AddEditCrewView: View {
             Form {
                 Section {
                     VStack {
-                        if let imageData = picture, let uiImage = UIImage(data: imageData) {
+                        if let imageData = crew.picture, let uiImage = UIImage(data: imageData) {
                             Image(uiImage: uiImage)
                                 .resizable()
                                 .scaledToFill()
@@ -70,7 +68,7 @@ struct AddEditCrewView: View {
                 
                 InputField(
                     "Name",
-                    textValue: $name,
+                    textValue: $crew.name,
                     isInvalid: $isNameInvalid,
                     isRequired: true,
                     capitalization: .words,
@@ -81,26 +79,26 @@ struct AddEditCrewView: View {
                 
                 InputField(
                     "Phone",
-                    textValue: $phone,
+                    textValue: $crew.phone,
                     inputType: .phone,
                     capitalization: .never
                 )
                 
                 InputField(
                     "Email",
-                    textValue: $email,
+                    textValue: $crew.email,
                     inputType: .email,
                     capitalization: .never
                 )
                 
                 InputField(
                     "Notes",
-                    textValue: $notes,
+                    textValue: $crew.notes,
                     lines: 5,
                     capitalization: .sentences
                 )
                 
-                Toggle(isOn: $isFavorite) {
+                Toggle(isOn: $crew.isFavorite) {
                     Text("Favorite")
                         .font(.title2)
                 }
@@ -130,7 +128,7 @@ struct AddEditCrewView: View {
             .sheet(isPresented: $showImagePicker) {
                 ImagePicker(sourceType: isCamera ? .camera : .photoLibrary) { image in
                     if let image = image {
-                        self.picture = image.jpegData(compressionQuality: 0.8)
+                        self.crew.picture = image.jpegData(compressionQuality: 0.8)
                     }
                 }
             }
@@ -144,14 +142,7 @@ struct AddEditCrewView: View {
     
     private func initializeFields() {
         guard let receivedCrew = crewToEdit else { return }
-        
-        name = receivedCrew.name.strUnwrap
-        email = receivedCrew.email.strUnwrap
-        phone = receivedCrew.phone.strUnwrap
-        notes = receivedCrew.notes.strUnwrap
-        picture = receivedCrew.picture
-        isFavorite = receivedCrew.isFavorite
-        
+        crew.update(from: receivedCrew)
     }
     
     private func getActionSheet() -> ActionSheet {
@@ -172,7 +163,7 @@ struct AddEditCrewView: View {
         let buttonRemove: ActionSheet.Button = .destructive(
             Text("Remove Photo"),
             action: {
-                self.picture = nil
+                self.crew.picture = nil
             }
         )
         let buttonCancel: ActionSheet.Button = .cancel()
@@ -188,25 +179,9 @@ struct AddEditCrewView: View {
         do {
             if crewToEdit == nil {
                 // Adding a new Crew
-                try crewVM.addCrew(
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    notes: notes,
-                    picture: picture,
-                    isFavorite: isFavorite
-                    )
+                try crewVM.addCrew(crew)
             } else {
-                // Editing an existing aircraft type
-                try crewVM.editCrew(
-                    crewToEdit!,
-                    name: name,
-                    email: email,
-                    phone: phone,
-                    notes: notes,
-                    picture: picture,
-                    isFavorite: isFavorite
-                )
+                try crewVM.editCrew( crewToEdit!, newCrew: crew)
             }
             try crewVM.fetchCrewList()
         } catch let details as ErrorDetails {

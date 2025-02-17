@@ -135,6 +135,7 @@ struct CrewsView: View {
             }
         }
         .onAppear {
+            try? crewVM.fetchCrewList()
             filterCrewList()
         }
         .onChange(of: crewVM.crewList, filterCrewList)
@@ -179,7 +180,9 @@ struct CrewsView: View {
         if searchText.isEmpty {
             filteredCrewList = crewVM.crewList
             if (filteredCrewList.isEmpty) {
-                try! crewVM.addCrew(name: "Self")
+                var crewSelf = CrewModel()
+                crewSelf.name = "Self"
+                try! crewVM.addCrew(CrewModel(name: "Self"))
             }
         } else {
             filteredCrewList = crewVM.crewList.filter { crew in

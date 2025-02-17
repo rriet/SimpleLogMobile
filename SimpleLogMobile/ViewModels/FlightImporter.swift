@@ -43,8 +43,17 @@ func FlightImporter() throws {
             try addCrew(row, sic: true)
             let crewSic = try? crewVM.getCrew(row[34])
             
-            try addFlight(row, airportDep: airportDep, airportArr: airportArr, aircaft: aircraft, crewPic: crewPic, crewSic: crewSic)
-            
+            if aircraft.isSimulator {
+                // Add simulator training
+            } else {
+                try addFlight(
+                    row,
+                    airportDep: airportDep,
+                    airportArr: airportArr,
+                    aircaft: aircraft,
+                    crewPic: crewPic,
+                    crewSic: crewSic)
+            }
         }
     }
     
@@ -150,34 +159,58 @@ func FlightImporter() throws {
     
     func addCrew(_ row: [String], sic: Bool = false) throws {
         
+        var crew = CrewModel()
+        
         var index = 30
         if sic {
             index = 34
         }
         
-        let name = row[index]
+        crew.name = row[index]
         index += 1
         
-        let exist = try crewVM.checkExist(name)
-        if exist || name.isEmpty { return }
+        let exist = try crewVM.checkExist(crew.name)
+        if exist || crew.name.isEmpty { return }
         
-        let email = row[index]
+        crew.email = row[index]
         index += 1
-        let phone = row[index]
+        crew.phone = row[index]
         index += 1
-        let notes = row[index]
+        crew.notes = row[index]
         
-        _ = try crewVM.addCrew(
-            name: name,
-            email: email,
-            phone: phone,
-            notes: notes)
+        _ = try crewVM.addCrew(crew)
     }
     
     func addFlight(_ row: [String], airportDep: Airport, airportArr: Airport, aircaft: Aircraft, crewPic: Crew?, crewSic: Crew?) throws {
         
         let depDate = Date(timeIntervalSince1970: TimeInterval(row[3]) ?? 0)
         let arrDate = Date(timeIntervalSince1970: TimeInterval(row[4]) ?? 0)
+        
+        let remarks = row[39]
+        let notes = row[40]
+        let takeOffday = row[41]
+        let takeOffNight = row[42]
+        let landingDay = row[43]
+        let landingNight = row[44]
+        let ifrApproaches = row[45]
+        let approachType = row[46]
+        let ifrTime = row[47]
+        let simInstTime = row[48]
+        let nightTime = row[49]
+        let crossCountryTime = row[50]
+        let picTime = row[51]
+        let picusTime = row[52]
+        let sicTime = row[53]
+        let dualTime = row[54]
+        let instructorTime = row[55]
+        let simulatorTime = row[56]
+        let customTime1 = row[57]
+        let customTime2 = row[58]
+        let customTime3 = row[59]
+        let customTime4 = row[60]
+        let totalTime = row[61]
+        
+        print(totalTime)
     }
     
 }
