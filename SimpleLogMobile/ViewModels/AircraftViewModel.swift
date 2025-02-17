@@ -13,10 +13,6 @@ class AircraftViewModel: ObservableObject {
     private let viewContext = PersistenceController.shared.viewContext
     @Published var aircraftList: [Aircraft] = []
     
-    init() {
-        try? fetchAircraftList()
-    }
-    
     func fetchAircraftList() throws {
         let request = Aircraft.fetchRequest()
         let sortStar = NSSortDescriptor(key: "isFavorite", ascending: false)

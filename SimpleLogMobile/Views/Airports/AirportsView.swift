@@ -119,7 +119,9 @@ struct AirportsView: View {
         .background(Color(Color.theme.secondaryBackground))
         // Hides the background of the list, so the color propagates from the back
         .scrollContentBackground(.hidden)
-        
+        .onAppear {
+            try? airportVM.fetchAirportList(refresh: true)
+        }
     }
     
     private func showAirport(_ airport: Airport) {

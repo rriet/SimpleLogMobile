@@ -83,6 +83,7 @@ struct AirportSelector: View {
                 }
                 .padding(.horizontal)
                 .onAppear {
+                    try? airportVM.fetchAirportList(refresh: true)
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {  // Slight delay to ensure focus works
                         isSearchFieldFocused = true
                     }

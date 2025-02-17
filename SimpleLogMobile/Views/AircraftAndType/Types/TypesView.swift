@@ -84,6 +84,9 @@ struct TypesView: View {
             AddEditTypeView($selectedType)
                 .interactiveDismissDisabled()
         }
+        .onAppear {
+            try? aircraftTypeVM.fetchTypeList()
+        }
     }
     
     private func refreshList(){

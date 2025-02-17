@@ -105,6 +105,9 @@ struct AircraftsView: View {
             AddEditAircraftView($selectedAircraft)
                 .interactiveDismissDisabled()
         }
+        .onAppear {
+            try? aircraftVM.fetchAircraftList()
+        }
     }
     
     private func deleteAircraft(_ aircraftToDelete: Aircraft) {

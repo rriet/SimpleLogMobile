@@ -25,10 +25,6 @@ class AirportViewModel: ObservableObject {
         case beginsWithIcaoIata
     }
     
-    init() {
-        try? fetchAirportList()
-    }
-    
     func fetchAirportList(offset: Int = 0, searchText: String = "", refresh: Bool = false, searchType: SearchType = .all) throws {
         guard !isFetching else { return }
         
