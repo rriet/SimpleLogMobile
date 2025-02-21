@@ -17,7 +17,7 @@ public class Airport: NSManagedObject, SwipeableItem, Comparable {
     }
     
     var allowDelete: Bool {
-        !self.isLocked
+        !self.isLocked && !self.hasFlights
     }
     
     var hasFlights: Bool {

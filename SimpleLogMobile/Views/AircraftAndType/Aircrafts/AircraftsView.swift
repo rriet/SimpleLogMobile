@@ -11,7 +11,7 @@ import CoreData
 struct AircraftsView: View {
     
     @EnvironmentObject var aircraftTypeVM: AircraftTypeViewModel
-    @ObservedObject private var aircraftVM = AircraftViewModel()
+    @StateObject private var aircraftVM = AircraftViewModel()
     
     var groupedAircrafts: [String: [Aircraft]] {
         // Get favorite aircrafts
@@ -104,6 +104,19 @@ struct AircraftsView: View {
         .sheet(isPresented: $showAddEdit) {
             AddEditAircraftView($selectedAircraft)
                 .interactiveDismissDisabled()
+        }
+        .onAppear{
+            refreshList()
+        }
+    }
+    
+    private func refreshList(){
+        do {
+            try aircraftVM.fetchAircraftList()
+        } catch {
+            alertManager.showAlert(.simple(
+                title: "Unexpected error:",
+                message: error.localizedDescription))
         }
     }
     

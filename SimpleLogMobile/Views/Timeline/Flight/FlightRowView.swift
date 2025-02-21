@@ -16,21 +16,45 @@ struct FlightRowView: View {
     let onToggleLock: () -> Void
     let onImageTapGesture: () -> Void
     
+    var formattedTotalBlockTime: String {
+        let hours = flight.timeTotalBlock / 60
+        let minutes = flight.timeTotalBlock % 60
+        return String(format: "%02d:%02d", hours, minutes)
+    }
+        
     var body: some View {
-        HStack{
-            VStack(alignment: .leading) {
-                Text(flight.dateStart.description)
-                    .lineLimit(1)
-                    .font(.headline)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.top)
+        HStack {
+            VStack {
+                Text(flight.dateStart.toString(format: "dd")) // Day
+                    .font(.title)
+                    .bold()
+                Text(flight.dateStart.toString(format: "MMM")) // Month
+                    .font(.title3)
+                    .foregroundColor(.gray)
+                Text(flight.dateStart.toString(format: "yyyy")) // Year
+                    .font(.caption)
+                    .foregroundColor(.secondary)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .contentShape(Rectangle())
-            .onTapGesture {onTapGesture()}
-            
+            VStack(alignment: .center, spacing: 5) {
+                HStack {
+                    // Departure & Arrival Airports (ICAO Codes)
+                    Text("\(flight.airportDep?.icao ?? "") - \(flight.airportArr?.icao  ?? "")")
+                        .font(.title)
+                }
+                
+                // Aircraft Registration
+                Text("Aircraft: \(flight.aircraft?.registration  ?? "")")
+                    .font(.subheadline)
+                
+                // Total Block Time formatted as HH:MM
+                Text("\(formattedTotalBlockTime)")
+                    .font(.subheadline)
+                    .foregroundColor(.gray)
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
         }
-        .frame(maxWidth: .infinity, minHeight: 70)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .contentShape(Rectangle())
         .clipped()
         .listRowBackground(Color.theme.background)
         .swipeActions(allowsFullSwipe: false) {
@@ -43,4 +67,14 @@ struct FlightRowView: View {
         }
     }
     
+    
+    
+}
+
+extension Date {
+    func toString(format: String) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = format
+        return formatter.string(from: self)
+    }
 }

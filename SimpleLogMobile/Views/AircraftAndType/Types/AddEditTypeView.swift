@@ -231,6 +231,7 @@ struct AddEditTypeView: View {
             ))
             return
         }
+        try! aircraftTypeVM.fetchTypeList()
         // Dismiss the view after a successful save
         dismiss()
     }

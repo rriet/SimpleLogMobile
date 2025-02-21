@@ -10,7 +10,7 @@ import CoreData
 
 struct AirportsView: View {
     
-    @ObservedObject private var airportVM = AirportViewModel()
+    @StateObject private var airportVM = AirportViewModel()
     
     @State private var searchText: String = ""
     
@@ -108,6 +108,9 @@ struct AirportsView: View {
         }
         .sheet(isPresented: $showOnMap) {
             ShowMapView(airport: $selectedAirport)
+        }
+        .onAppear{
+            try! airportVM.fetchAirportList(refresh: true)
         }
         .floatingButton(
             buttonContent: AnyView(

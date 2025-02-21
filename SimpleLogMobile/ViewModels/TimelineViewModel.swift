@@ -12,17 +12,25 @@ class TimelineViewModel: ObservableObject {
     private let viewContext = PersistenceController.shared.viewContext
     @Published var timelineList: [Timeline] = []
     
-    init() {
-        try? fetchTimelineList()
-    }
+    private var batchSize = 20
     
-    func fetchTimelineList() throws {
+    func fetchTimelineList(offset: Int = 0, refresh: Bool = false) throws {
         let request = Timeline.fetchRequest()
-        let sort = NSSortDescriptor(key: "dateValue", ascending: true)
+        let sort = NSSortDescriptor(key: "dateValue", ascending: false)
         request.sortDescriptors = [sort]
+        request.fetchLimit = batchSize
+        request.fetchOffset = offset
         
         do {
-            timelineList = try viewContext.fetch(request)
+            let listResult = try viewContext.fetch(request)
+            
+            DispatchQueue.main.async {
+                if refresh {
+                    self.timelineList = listResult
+                } else {
+                    self.timelineList.append(contentsOf: listResult)
+                }
+            }
         }catch {
             throw ErrorDetails(
                 title: "Error!",

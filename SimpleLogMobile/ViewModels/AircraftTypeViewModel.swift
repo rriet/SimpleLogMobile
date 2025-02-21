@@ -13,10 +13,6 @@ class AircraftTypeViewModel: ObservableObject {
     private let viewContext = PersistenceController.shared.viewContext
     @Published var typeList: [AircraftType] = []
     
-    init() {
-        try? fetchTypeList()
-    }
-    
     func fetchFamilyList() throws -> [String] {
         // Create a fetch request for AircraftType
         let request = NSFetchRequest<NSFetchRequestResult>(entityName: "AircraftType")
@@ -203,6 +199,5 @@ class AircraftTypeViewModel: ObservableObject {
                 title: "Error!",
                 message: "There was an unknown error saving to database.")
         }
-        try fetchTypeList()
     }
 }

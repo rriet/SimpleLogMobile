@@ -10,7 +10,7 @@ import CoreData
 
 struct TimelineView: View {
     
-    @ObservedObject private var timelineVM = TimelineViewModel()
+    @StateObject private var timelineVM = TimelineViewModel()
     
     @State private var showAddDialog = false
     @State private var showAddEditFlight = false
@@ -22,7 +22,7 @@ struct TimelineView: View {
         ZStack{
             VStack {
                 Text("SimpleLog")
-                    .font(.largeTitle)
+                    .font(.title)
                     .padding(.vertical, 1)
                     
                 if !timelineVM.timelineList.isEmpty {
@@ -52,7 +52,19 @@ struct TimelineView: View {
                                 }
                                 
                             }
+                            .onAppear {
+                                if event == timelineVM.timelineList.last {
+                                    try! timelineVM.fetchTimelineList(offset: timelineVM.timelineList.count)
+                                }
+                            }
                         }
+                        // Spacer to allow last entry to scroll pass the + button
+                        Section {
+                            Spacer()
+                                .frame(height: 100)
+                                .listRowBackground(Color.clear)
+                        }
+                        
                     }
                     
                 } else {
@@ -66,12 +78,7 @@ struct TimelineView: View {
                         )
                         .background(Color.theme.secondaryBackground)
                 }
-                // Spacer to allow last entry to scroll pass the + button
-                Section {
-                    Spacer()
-                        .frame(height: 100)
-                        .listRowBackground(Color.clear)
-                }
+                
             }
             VStack {
                 // VStack with spacer to position the confirmation dialog in the bottom of the screen for iPad
@@ -103,6 +110,9 @@ struct TimelineView: View {
         .sheet(isPresented: $showAddEditFlight) {
             AddEditFlight($selectedFlight, timelineVM: timelineVM)
                 .interactiveDismissDisabled()
+        }
+        .onAppear {
+            try! timelineVM.fetchTimelineList(refresh: true)
         }
     }
     

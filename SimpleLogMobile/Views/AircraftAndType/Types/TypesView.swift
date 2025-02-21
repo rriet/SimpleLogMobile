@@ -84,6 +84,9 @@ struct TypesView: View {
             AddEditTypeView($selectedType)
                 .interactiveDismissDisabled()
         }
+        .onAppear{
+            refreshList()
+        }
     }
     
     private func refreshList(){
@@ -122,6 +125,7 @@ struct TypesView: View {
             confirmAction: {
                 do {
                     try aircraftTypeVM.deleteType(typeToDelete)
+                    refreshList()
                 } catch let details as ErrorDetails {
                     alertManager.showAlert(.error(details: details))
                 } catch {

@@ -13,17 +13,32 @@ class AircraftViewModel: ObservableObject {
     private let viewContext = PersistenceController.shared.viewContext
     @Published var aircraftList: [Aircraft] = []
     
-    init() {
-        try? fetchAircraftList()
+    enum SearchType {
+        case all
+        case aircraft
+        case simulator
     }
     
-    func fetchAircraftList() throws {
+    func fetchAircraftList(searchType: SearchType = .all) throws {
         let request = Aircraft.fetchRequest()
         let sortStar = NSSortDescriptor(key: "isFavorite", ascending: false)
         let sortRegistration = NSSortDescriptor(key: "registration", ascending: true)
         request.sortDescriptors = [sortStar, sortRegistration]
         
+        var predicate: NSPredicate?
+        switch searchType {
+        case .all:
+            predicate = nil
+        case .aircraft:
+            predicate = NSPredicate(format: "isSimulator == %@", NSNumber(value: false))
+        case .simulator:
+            predicate = NSPredicate(format: "isSimulator == %@", NSNumber(value: true))
+        }
+        
         do {
+            if let predicate = predicate {
+                request.predicate = predicate
+            }
             aircraftList = try viewContext.fetch(request)
         }catch {
             throw ErrorDetails(
@@ -165,6 +180,5 @@ class AircraftViewModel: ObservableObject {
                 title: "Error!",
                 message: "There was an unknown error saving to database.")
         }
-        try fetchAircraftList()
     }
 }

@@ -10,7 +10,7 @@ import CoreData
 
 struct CrewsView: View {
     
-    @ObservedObject private var crewVM = CrewViewModel()
+    @StateObject private var crewVM = CrewViewModel()
     
     @State private var searchText: String = ""
     @State private var filteredCrewList: [Crew] = []
@@ -159,6 +159,9 @@ struct CrewsView: View {
         .sheet(isPresented: $showLargeImage) {
             ZoomPictureView(crew: $selectedCrew)
                 .presentationDetents([.medium])
+        }
+        .onAppear {
+            try! crewVM.fetchCrewList()
         }
         
         .frame(maxWidth: .infinity, maxHeight: .infinity)

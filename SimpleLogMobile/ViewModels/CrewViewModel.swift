@@ -13,10 +13,6 @@ class CrewViewModel: ObservableObject {
     private let viewContext = PersistenceController.shared.viewContext
     @Published var crewList: [Crew] = []
     
-    init() {
-        try? fetchCrewList()
-    }
-    
     func fetchCrewList() throws {
         let request = Crew.fetchRequest()
         let sort = NSSortDescriptor(key: "name", ascending: true)
@@ -38,10 +34,8 @@ class CrewViewModel: ObservableObject {
         notes: String = "",
         picture: Data? = nil,
         isFavorite: Bool = false
-    ) throws {
+    ) throws -> Crew {
         let newCrew = Crew(context: viewContext)
-        
-        let isLocked = AppSettings.autoLockNewEntries
         
         try editCrew(newCrew,
                      name: name,
@@ -49,8 +43,10 @@ class CrewViewModel: ObservableObject {
                      phone: phone,
                      notes: notes,
                      picture: picture,
-                     isLocked: isLocked,
+                     isLocked: AppSettings.autoLockNewEntries,
                      isFavorite: isFavorite)
+        
+        return newCrew
     }
     
     func editCrew(_ crewToEdit: Crew,
@@ -163,6 +159,5 @@ class CrewViewModel: ObservableObject {
                 title: "Error!",
                 message: "There was an unknown error saving to database.")
         }
-        try fetchCrewList()
     }
 }

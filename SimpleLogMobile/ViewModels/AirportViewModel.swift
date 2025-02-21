@@ -25,10 +25,6 @@ class AirportViewModel: ObservableObject {
         case beginsWithIcaoIata
     }
     
-    init() {
-        try? fetchAirportList()
-    }
-    
     func fetchAirportList(offset: Int = 0, searchText: String = "", refresh: Bool = false, searchType: SearchType = .all) throws {
         guard !isFetching else { return }
         
@@ -222,6 +218,5 @@ class AirportViewModel: ObservableObject {
                 title: "Error!",
                 message: "There was an unknown error saving to database.")
         }
-        objectWillChange.send()
     }
 }

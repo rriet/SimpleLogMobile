@@ -5,8 +5,6 @@
 //  Created by Ricardo Riet Correa on 14/02/2025.
 //
 
-// "Date (DD/MM/YYYY)","Departure Time (HH:MM)","Arrival Time (HH:MM)","Departure Epoch","Arrival Epoch","Departure Icao","Departure Iata","Departure Airport Name","Departure City","Departure Country","Departure Latitude","Departure Longitude","Arrival Icao","Arrival Iata","Arrival Airport Name","Arrival City","Arrival Country","Arrival Latitude","Arrival Longitude","Aircraft Registration","Aircraft MTOW","Aircraft Simulator","Model Make & Model","Model Group","Model Engine Type","Model MTOW","Model Multi Engine","Model Multi Pilot","Model EFIS","Model Seaplane","PIC Name","PIC Email","PIC Phone","PIC Comments","SIC Name","SIC Email","SIC Phone","SIC Comments","Pilot Function","Remarks","Private notes","Takeoff day","Takeoff night","Landing day","Landing night","IFR Approaches","Approach Type","IFR Minutes","Simulated Instrument Minutes","Night Minutes","Corss country Minutes","PIC Minutes","PICUS Minutes","SIC Minutes","Dual Minutes","Instructor Minutes","Simulator Minutes","Custom Time 1 Minutes","Custom Time 2 Minutes","Custom Time 3 Minutes","Custom Time 4 Minutes","Total Minutes"
-
 import Foundation
 
 func FlightImporter() throws {
@@ -15,6 +13,8 @@ func FlightImporter() throws {
     let aircraftVM = AircraftViewModel()
     let airportVM = AirportViewModel()
     let crewVM = CrewViewModel()
+    let flightVM = FlightViewModel()
+    let simulatorVM = SimulatorViewModel()
     
     if let fileURL = Bundle.main.url(forResource: "flights", withExtension: "csv") {
         
@@ -178,6 +178,76 @@ func FlightImporter() throws {
         
         let depDate = Date(timeIntervalSince1970: TimeInterval(row[3]) ?? 0)
         let arrDate = Date(timeIntervalSince1970: TimeInterval(row[4]) ?? 0)
+        
+        let remarks = row[39]
+        let notes = row[40]
+        
+        var crewList: [Crew: CrewPosition] = [:]
+        if let pic = crewPic {
+            crewList[pic] = .PIC
+        }
+        
+        if let sic = crewSic {
+            crewList[sic] = .SIC
+        }
+        
+        // Get Simulator time before flight data
+        let timeSimulator = Int(row[56]) ?? 0
+        if timeSimulator > 0 {
+//            _ = 
+        } else {
+            let takeOffday = row[41]
+            let takeOffNight = row[42]
+            let landingDay = row[43]
+            let landingNight = row[44]
+            let ifrApproaches = row[45]
+            let approachType = row[46]
+            let timeIfr = row[47]
+            let timeSimulatedInstrument = row[48]
+            let timeNight = row[49]
+            let timeCrossCountry = row[50]
+            let timePic = row[51]
+            let timePicus = row[52]
+            let timeSic = row[53]
+            let timeDual = row[54]
+            let timeInstructor = row[55]
+            let timeCustom1 = row[57]
+            let timeCustom2 = row[58]
+            let timeCustom3 = row[59]
+            let timeCustom4 = row[60]
+            let timeTotalBlock = row[61]
+            
+            _ = try flightVM.addFlight(
+                depDate: depDate,
+                arrDate: arrDate,
+                airportDep: airportDep,
+                airportArr: airportArr,
+                aircaft: aircaft,
+                remarks: remarks,
+                notes: notes,
+                takeOffday: Int(takeOffday) ?? 0,
+                takeOffNight: Int(takeOffNight) ?? 0,
+                landingDay: Int(landingDay) ?? 0,
+                landingNight: Int(landingNight) ?? 0,
+                ifrApproaches: Int(ifrApproaches) ?? 0,
+                approachType: approachType,
+                timeIfr: Int(timeIfr) ?? 0,
+                timeSimulatedInstrument: Int(timeSimulatedInstrument) ?? 0,
+                timeNight: Int(timeNight) ?? 0,
+                timeCrossCountry: Int(timeCrossCountry) ?? 0,
+                timePic: Int(timePic) ?? 0,
+                timePicus: Int(timePicus) ?? 0,
+                timeSic: Int(timeSic) ?? 0,
+                timeDual: Int(timeDual) ?? 0,
+                timeInstructor: Int(timeInstructor) ?? 0,
+                timeCustom1: Int(timeCustom1) ?? 0,
+                timeCustom2: Int(timeCustom2) ?? 0,
+                timeCustom3: Int(timeCustom3) ?? 0,
+                timeCustom4: Int(timeCustom4) ?? 0,
+                timeTotalBlock: Int(timeTotalBlock) ?? 0,
+                timeTotalFlight: 0,
+                crew: crewList)
+        }
+        
     }
-    
 }

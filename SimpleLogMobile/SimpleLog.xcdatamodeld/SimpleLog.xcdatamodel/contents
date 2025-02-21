@@ -58,11 +58,12 @@
         <relationship name="dutyStart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="dutyStart" inverseEntity="Timeline"/>
     </entity>
     <entity name="Flight" representedClassName="Flight" syncable="YES" codeGenerationType="category">
-        <attribute name="apporacheIfr" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="apporacheType" optional="YES" attributeType="String"/>
+        <attribute name="approachType" optional="YES" attributeType="String"/>
         <attribute name="dateEnd" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="dateLanding" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="dateTakeoff" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="endorsementSignature" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
+        <attribute name="ifrApproaches" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="landingDay" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="landingNight" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -70,7 +71,7 @@
         <attribute name="remarks" optional="YES" attributeType="String"/>
         <attribute name="takeoffDay" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="takeoffNight" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="timeBlock" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeCrossCountry" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="timeCustom1" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="timeCustom2" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="timeCustom3" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -83,8 +84,9 @@
         <attribute name="timePic" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="timePicUs" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="timeSic" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="timeSimInst" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <attribute name="timeXc" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeSimulatedInstrument" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeTotalBlock" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="timeTotalFlight" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="aircraft" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="flights" inverseEntity="Aircraft"/>
         <relationship name="airportArr" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsArriving" inverseEntity="Airport"/>
         <relationship name="airportDep" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsDeparting" inverseEntity="Airport"/>
@@ -92,7 +94,7 @@
         <relationship name="startTimeline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="flightStart" inverseEntity="Timeline"/>
     </entity>
     <entity name="FlightCrew" representedClassName="FlightCrew" syncable="YES" codeGenerationType="category">
-        <attribute name="position" optional="YES" attributeType="String"/>
+        <attribute name="positionString" optional="YES" attributeType="String"/>
         <relationship name="crew" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Crew" inverseName="flightCrew" inverseEntity="Crew"/>
         <relationship name="flight" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Flight" inverseName="flightCrew" inverseEntity="Flight"/>
         <relationship name="simulatorTraining" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SimulatorTraining" inverseName="flightCrew" inverseEntity="SimulatorTraining"/>
@@ -111,7 +113,12 @@
         <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
     </entity>
     <entity name="SimulatorTraining" representedClassName="SimulatorTraining" syncable="YES" codeGenerationType="category">
+        <attribute name="dateEnd" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="endorsementSignature" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
         <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="notes" optional="YES" attributeType="String"/>
+        <attribute name="remarks" optional="YES" attributeType="String" defaultValueString=""/>
+        <attribute name="timeSession" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="aircraft" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="simTrainings" inverseEntity="Aircraft"/>
         <relationship name="flightCrew" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FlightCrew" inverseName="simulatorTraining" inverseEntity="FlightCrew"/>
         <relationship name="startTimeline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="simulatorStart" inverseEntity="Timeline"/>
