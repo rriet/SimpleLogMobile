@@ -19,25 +19,34 @@ class AircraftViewModel: ObservableObject {
         case simulator
     }
     
-    func fetchAircraftList(searchType: SearchType = .all) throws {
+    func fetchAircraftList(searchType: SearchType = .all, searchString: String = "", includeType: Bool = false) throws {
         let request = Aircraft.fetchRequest()
         let sortStar = NSSortDescriptor(key: "isFavorite", ascending: false)
         let sortRegistration = NSSortDescriptor(key: "registration", ascending: true)
         request.sortDescriptors = [sortStar, sortRegistration]
         
-        var predicate: NSPredicate?
+        var predicates: [NSPredicate] = []
         switch searchType {
         case .all:
-            predicate = nil
+            break // No filtering needed
         case .aircraft:
-            predicate = NSPredicate(format: "isSimulator == %@", NSNumber(value: false))
+            predicates.append(NSPredicate(format: "isSimulator == %@", NSNumber(value: false)))
         case .simulator:
-            predicate = NSPredicate(format: "isSimulator == %@", NSNumber(value: true))
+            predicates.append(NSPredicate(format: "isSimulator == %@", NSNumber(value: true)))
+        }
+            
+            // Filter by registration search string (if provided)
+        if !searchString.isEmpty {
+            if includeType {
+                predicates.append(NSPredicate(format: "(registration CONTAINS[cd] %@) OR (aircraftType.designator CONTAINS[cd] %@)", searchString, searchString))
+            } else {
+                predicates.append(NSPredicate(format: "registration CONTAINS[cd] %@", searchString))
+            }
         }
         
         do {
-            if let predicate = predicate {
-                request.predicate = predicate
+            if !predicates.isEmpty {
+                request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
             }
             aircraftList = try viewContext.fetch(request)
         }catch {
@@ -53,7 +62,7 @@ class AircraftViewModel: ObservableObject {
         aircraftType: AircraftType,
         isSimulator: Bool,
         isFavorite: Bool = false
-    ) throws {
+    ) throws -> Aircraft {
         
         let newAircraft = Aircraft(context: viewContext)
         
@@ -68,6 +77,7 @@ class AircraftViewModel: ObservableObject {
             isLocked: isLocked,
             isFavorite: isFavorite
         )
+        return newAircraft
     }
     
     func editAircraft(

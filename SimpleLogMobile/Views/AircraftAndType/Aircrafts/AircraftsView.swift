@@ -33,10 +33,30 @@ struct AircraftsView: View {
     
     @State private var selectedAircraft: Aircraft?
     @State private var showAddEdit = false
+    @State private var searchText: String = ""
     @StateObject var alertManager = AlertManager()
+    
     
     var body: some View {
         VStack {
+            HStack {
+                Text("Aircrafts")
+                    .font(.headline)
+                TextField("Registration or Type", text: $searchText)
+                    .textFieldStyle(RoundedBorderTextFieldStyle())
+                    .textInputAutocapitalization(.characters)
+                    .autocorrectionDisabled()
+                    .padding(.horizontal)
+                    .onChange(of: searchText, onChangeOfSearchText)
+                Button {
+                    newAircraft()
+                } label: {
+                    Image(systemName: "plus") // Use an Image
+                        .font(.system(size: 20, weight: .bold))
+                        .frame(width: 34, height: 34)
+                }
+            }
+            .padding(.horizontal)
             if !groupedAircrafts.isEmpty {
                 List {
                     ForEach(groupedAircrafts.keys.sorted{ (key1, key2) -> Bool in
@@ -91,18 +111,14 @@ struct AircraftsView: View {
         }
         // Hides the background of the list, so the color propagates from the back
         .scrollContentBackground(.hidden)
-        .floatingButton(
-            buttonContent: AnyView(
-                Image(systemName: "plus")
-                    .foregroundColor(.white)
-                    .font(.title)
-            ),
-            action: newAircraft)
         
         // Edit Screen
         // sheet works on all systems, but is dismissible on IOS, not dismissible on MacOS
         .sheet(isPresented: $showAddEdit) {
-            AddEditAircraftView($selectedAircraft)
+            AddEditAircraftView($selectedAircraft, onSave: {
+                refreshList()
+                try! aircraftTypeVM.fetchTypeList()
+            })
                 .interactiveDismissDisabled()
         }
         .onAppear{
@@ -118,6 +134,11 @@ struct AircraftsView: View {
                 title: "Unexpected error:",
                 message: error.localizedDescription))
         }
+    }
+    
+    private func onChangeOfSearchText(oldValue: String , newValue: String) {
+        
+        try! aircraftVM.fetchAircraftList(searchString: newValue, includeType: true)
     }
     
     private func deleteAircraft(_ aircraftToDelete: Aircraft) {

@@ -192,9 +192,17 @@ func FlightImporter() throws {
         }
         
         // Get Simulator time before flight data
-        let timeSimulator = Int(row[56]) ?? 0
-        if timeSimulator > 0 {
-//            _ = 
+        let timeSession = Int(row[56]) ?? 0
+        if timeSession > 0 {
+            _ = try! simulatorVM.addSimulatorTraining(
+                startDate: depDate,
+                endDate: arrDate,
+                aircraft: aircaft,
+                remarks: remarks,
+                notes: notes,
+                timeSession: timeSession,
+                crew: crewList,
+                endorsementSignature: nil)
         } else {
             let takeOffday = row[41]
             let takeOffNight = row[42]

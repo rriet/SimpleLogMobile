@@ -43,19 +43,24 @@ struct CrewsView: View {
     var body: some View {
         ZStack{
             VStack {
-                Text("Crew")
-                    .font(.largeTitle)
-                    .padding(.vertical, 1)
                 if !crewVM.crewList.isEmpty {
                     HStack {
-                        Text("Search:")
-                        TextField("Search", text: $searchText)
+                        Text("Crew")
+                            .font(.headline)
+                        TextField("Name, email, phone or notes", text: $searchText)
                             .autocorrectionDisabled(true)
+                            .minimumScaleFactor(0.8)
                             .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .padding(.horizontal)
                             .onChange(of: searchText) { oldValue , newValue in
                                 filterCrewList()
                             }
+                        Button {
+                            newCrew()
+                        } label: {
+                            Image(systemName: "plus")
+                                .font(.system(size: 20, weight: .bold))
+                                .frame(width: 34, height: 34)
+                        }
                     }
                     .padding(.horizontal)
                     if !filteredCrewList.isEmpty {
@@ -143,12 +148,6 @@ struct CrewsView: View {
         }
         // Hides the background of the list, so the color propagates from the back
         .scrollContentBackground(.hidden)
-        .floatingButton(
-            buttonContent: AnyView(
-                Image(systemName: "plus")
-                    .foregroundColor(.white)
-                    .font(.title)
-            ), action: newCrew)
         
         // Edit Screen
         // sheet works on all systems, but is dismissible on IOS, not dismissible on MacOS

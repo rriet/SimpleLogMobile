@@ -21,18 +21,24 @@ struct AirportsView: View {
     
     var body: some View {
         VStack {
-            Text("Airport")
-                .font(.largeTitle)
-                .padding(.vertical, 1)
             HStack {
-                Text("Search:")
+                Text("Airports")
+                    .font(.headline)
                 TextField("ICAO, IATA, Name, City or Country", text: $searchText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
                     .textInputAutocapitalization(.characters)
                     .autocorrectionDisabled()
+                    .minimumScaleFactor(0.8)
                     .onChange(of: searchText) { oldValue , newValue in
                         try! airportVM.fetchAirportList(searchText: newValue, refresh: true)
                     }
+                Button {
+                    newAirport()
+                } label: {
+                    Image(systemName: "plus")
+                        .font(.system(size: 20, weight: .bold))
+                        .frame(width: 34, height: 34)
+                }
             }
             .padding(.horizontal)
             if !airportVM.airportList.isEmpty {
@@ -112,12 +118,6 @@ struct AirportsView: View {
         .onAppear{
             try! airportVM.fetchAirportList(refresh: true)
         }
-        .floatingButton(
-            buttonContent: AnyView(
-                Image(systemName: "plus")
-                    .foregroundColor(.white)
-                    .font(.title)
-            ), action: newAirport)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(Color.theme.secondaryBackground))
         // Hides the background of the list, so the color propagates from the back

@@ -10,7 +10,11 @@ import Foundation
 import CoreData
 
 @objc(FlightCrew)
-public class FlightCrew: NSManagedObject {
+public class FlightCrew: NSManagedObject, Comparable {
+    
+    public static func < (lhs: FlightCrew, rhs: FlightCrew) -> Bool {
+        lhs.crew?.name ?? "" < rhs.crew?.name ?? ""
+    }
 
     var position: CrewPosition {
         get {

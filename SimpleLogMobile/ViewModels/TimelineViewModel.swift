@@ -9,6 +9,7 @@ import Foundation
 import CoreData
 
 class TimelineViewModel: ObservableObject {
+    
     private let viewContext = PersistenceController.shared.viewContext
     @Published var timelineList: [Timeline] = []
     

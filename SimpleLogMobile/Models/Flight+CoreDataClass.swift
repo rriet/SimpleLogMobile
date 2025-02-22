@@ -25,4 +25,9 @@ public class Flight: NSManagedObject, SwipeableItem, Comparable {
     var dateStart: Date {
         self.startTimeline?.getDate ?? .now
     }
+    
+    var flightCrewArray: [FlightCrew] {
+        let crew = self.flightCrew as? Set<FlightCrew> ?? []
+        return crew.sorted()
+    }
 }

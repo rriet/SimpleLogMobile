@@ -21,9 +21,43 @@ struct TimelineView: View {
     var body: some View {
         ZStack{
             VStack {
-                Text("SimpleLog")
-                    .font(.title)
-                    .padding(.vertical, 1)
+                HStack{
+                    Button {
+                        showAddDialog.toggle()
+                    } label: {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                            .font(.system(size: 20, weight: .bold))
+                            .frame(width: 34, height: 34)
+                    }
+                    Spacer()
+                    Text("SimpleLog")
+                        .font(.headline)
+                    Spacer()
+                    Button {
+                        showAddDialog.toggle()
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: 20, weight: .bold))
+                            .frame(width: 34, height: 34)
+                    }
+                    .confirmationDialog("Change background", isPresented: $showAddDialog) {
+                        Button("New Flight") { addFlight() }
+                        Button("Next Flight") {
+                            // TODO:
+                        }
+                        Button("Return Flight") {
+//                            try! timelineVM.fetchTimelineList()
+                        }
+                        Button("Duty") {
+//                            try! AirportImporter()
+                            try! FlightImporter()
+                        }
+                        Button("Simulator") { }
+                        Button("Positioning") { }
+                        Button("Cancel", role: .cancel) { }
+                    }
+                }
+                .padding(.horizontal)
                     
                 if !timelineVM.timelineList.isEmpty {
                     List {
@@ -49,6 +83,10 @@ struct TimelineView: View {
 //                                            selectedCrew = crew
 //                                            showLargeImage = true
                                         })
+                                }
+                                
+                                if event.hasSimulatorTraining {
+                                    Text("\(event.simulatorTraining.dateStart)")
                                 }
                                 
                             }
@@ -79,25 +117,6 @@ struct TimelineView: View {
                         .background(Color.theme.secondaryBackground)
                 }
                 
-            }
-            VStack {
-                // VStack with spacer to position the confirmation dialog in the bottom of the screen for iPad
-                Spacer()
-                Text("")
-                    .confirmationDialog("Change background", isPresented: $showAddDialog) {
-                        Button("Next Flight") { addFlight() }
-                        Button("Return Flight") {
-//                            try! timelineVM.addRandomData()
-//                            try! timelineVM.fetchTimelineList()
-                        }
-                        Button("Duty") {
-//                            try! AirportImporter()
-                            try! FlightImporter()
-                        }
-                        Button("Simulator") { }
-                        Button("Positioning") { }
-                        Button("Cancel", role: .cancel) { }
-                    }
             }
         }
         .floatingButton(

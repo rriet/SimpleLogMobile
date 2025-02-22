@@ -16,13 +16,13 @@ class SimulatorViewModel: ObservableObject {
     func addSimulatorTraining(
             startDate: Date,
             endDate: Date,
-            aircaft: Aircraft,
+            aircraft: Aircraft,
             remarks: String,
             notes: String,
             timeSession: Int,
             crew: [Crew: CrewPosition],
             endorsementSignature: Data?
-    ) throws -> SimulatorTraining{
+    ) throws -> SimulatorTraining {
             
         let newSimualtorTraining = SimulatorTraining(context: viewContext)
         newSimualtorTraining.startTimeline = Timeline(context: viewContext)
@@ -31,7 +31,7 @@ class SimulatorViewModel: ObservableObject {
             newSimualtorTraining: newSimualtorTraining,
             startDate: startDate,
             endDate: endDate,
-            aircaft: aircaft,
+            aircraft: aircraft,
             remarks: remarks,
             notes: notes,
             timeSession: timeSession,
@@ -46,7 +46,7 @@ class SimulatorViewModel: ObservableObject {
             newSimualtorTraining: SimulatorTraining,
             startDate: Date,
             endDate: Date,
-            aircaft: Aircraft,
+            aircraft: Aircraft,
             remarks: String,
             notes: String,
             timeSession: Int,
@@ -56,7 +56,7 @@ class SimulatorViewModel: ObservableObject {
             
             newSimualtorTraining.startTimeline?.dateValue = startDate
             newSimualtorTraining.dateEnd = endDate
-            newSimualtorTraining.aircraft = aircaft
+            newSimualtorTraining.aircraft = aircraft
             newSimualtorTraining.remarks = remarks
             newSimualtorTraining.notes = notes
             newSimualtorTraining.timeSession = Int16(timeSession)

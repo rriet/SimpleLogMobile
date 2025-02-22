@@ -22,6 +22,22 @@ struct TypesView: View {
     
     var body: some View {
         VStack {
+            ZStack {
+                Text("Types")
+                    .font(.headline)
+                
+                HStack {
+                    Button {
+                        newType()
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: 20, weight: .bold))
+                            .frame(width: 34, height: 34)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .trailing) // Aligns the button to the right
+            }
+            .padding(.horizontal)
             if !groupedTypes.isEmpty {
                 List {
                     ForEach(groupedTypes.keys.sorted(), id: \.self) { groupName in
@@ -71,12 +87,6 @@ struct TypesView: View {
 
         // Hides the background of the list, so the color propagates from the back
         .scrollContentBackground(.hidden)
-        .floatingButton(
-            buttonContent: AnyView(
-                Image(systemName: "plus")
-                    .foregroundColor(.white)
-                    .font(.title)
-            ), action: newType)
         
         // Edit Screen
         // sheet works on all systems, but is dismissible on IOS, not dismissible on MacOS

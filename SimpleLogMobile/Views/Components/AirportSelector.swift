@@ -9,7 +9,7 @@ import SwiftUI
 
 struct AirportInputLine: View {
     
-    @ObservedObject private var airportVM = AirportViewModel()
+    @StateObject private var airportVM = AirportViewModel()
     
     @Binding var airport: Airport?
     @State private var showAirportSelector = false
@@ -53,7 +53,7 @@ struct AirportSelector: View {
     // Environment property to dismiss the current view
     @Environment(\.dismiss) var dismiss
     
-    @ObservedObject private var airportVM = AirportViewModel()
+    @StateObject private var airportVM = AirportViewModel()
     
     @Binding var airport: Airport?
     @State private var searchText: String = ""
@@ -83,6 +83,7 @@ struct AirportSelector: View {
                 }
                 .padding(.horizontal)
                 .onAppear {
+                    try! airportVM.fetchAirportList()
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {  // Slight delay to ensure focus works
                         isSearchFieldFocused = true
                     }

@@ -20,4 +20,8 @@ public class SimulatorTraining: NSManagedObject, SwipeableItem, Comparable {
     var allowDelete: Bool {
         !self.isLocked
     }
+    
+    var dateStart: Date {
+        self.startTimeline?.getDate ?? .now
+    }
 }

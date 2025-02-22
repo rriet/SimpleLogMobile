@@ -29,8 +29,11 @@ struct AddEditAircraftView: View {
     @State private var showAddTypeSheet = false
     @StateObject var alertManager = AlertManager()
     
-    init(_ aircraft: Binding<Aircraft?>) {
+    let onSave: () -> Void
+    
+    init(_ aircraft: Binding<Aircraft?>, onSave: @escaping () -> Void) {
         self._aircraftToEdit = aircraft
+        self.onSave = onSave
     }
     
     var body: some View {
@@ -168,8 +171,7 @@ struct AddEditAircraftView: View {
                         isFavorite: isFavorite
                     )
                 }
-                try aircraftVM.fetchAircraftList()
-                try aircraftTypeVM.fetchTypeList()
+                onSave()
             } catch let details as ErrorDetails {
                 // Handle specific error details
                 alertManager.showAlert(.error(details: details))

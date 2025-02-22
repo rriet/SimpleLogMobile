@@ -27,4 +27,12 @@ public class Timeline: NSManagedObject, Comparable {
     var flight: Flight {
         return self.flightStart!
     }
+    
+    var hasSimulatorTraining: Bool {
+        self.simulatorStart != nil
+    }
+    
+    var simulatorTraining: SimulatorTraining {
+        self.simulatorStart!
+    }
 }

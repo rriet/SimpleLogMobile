@@ -15,19 +15,10 @@ struct AircraftAndTypesView: View {
     var body: some View {
         ViewThatFits {
             HStack {
-                VStack {
-                    Text("Types")
-                        .font(.largeTitle)
-                        .padding(.vertical, 1)
-                    TypesView()
-                }
+                TypesView()
                 .frame(minWidth: 300, maxWidth: .infinity)
-                VStack {
-                    Text("Aircrafts")
-                        .font(.largeTitle)
-                        .padding(.vertical, 1)
-                    AircraftsView()
-                }
+                
+                AircraftsView()
                 .frame(minWidth: 300, maxWidth: .infinity)
             }
             VStack {
@@ -40,6 +31,7 @@ struct AircraftAndTypesView: View {
                     Text("Aircrafts").tag("Aircrafts") // Option for Aircrafts
                 }
                 .pickerStyle(SegmentedPickerStyle()) // Optionally, you can change the style
+                .padding(.bottom, 5)
                 
                 // Conditionally render views based on the selectedView
                 if selectedView == "Types" {
