@@ -124,6 +124,9 @@ struct AddEditAircraftView: View {
     
     
     private func initializeFields() {
+        if aircraftTypeVM.typeList.isEmpty {
+            try! aircraftTypeVM.fetchTypeList()
+        }
         guard let receivedAircraft = aircraftToEdit else { return }
         
         registration = receivedAircraft.registration.strUnwrap
@@ -152,7 +155,7 @@ struct AddEditAircraftView: View {
             do {
                 if aircraftToEdit == nil {
                     // Adding a new aircraft type
-                    try aircraftVM
+                    aircraftToEdit = try aircraftVM
                         .addAircraft(
                             registration: registration,
                             aircraftMtow: aircraftMtow,

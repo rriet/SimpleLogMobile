@@ -45,6 +45,7 @@ struct InputHour: View {
                     HStack {
                         Text("\(title)")
                             .lineLimit(1)
+                            .frame(minWidth: 80, alignment: .leading)
                         DatePicker(
                             "",
                             selection: $date,
@@ -55,6 +56,7 @@ struct InputHour: View {
                 case .text:
                 HStack(alignment: .center) {
                     Text("\(title)")
+                        .frame(minWidth: 70, alignment: .leading)
                     VStack{
                         TextField("", text: $timeText)
                             .keyboardType(.numberPad)

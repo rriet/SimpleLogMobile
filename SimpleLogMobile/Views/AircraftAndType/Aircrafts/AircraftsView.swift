@@ -13,6 +13,11 @@ struct AircraftsView: View {
     @EnvironmentObject var aircraftTypeVM: AircraftTypeViewModel
     @StateObject private var aircraftVM = AircraftViewModel()
     
+    @State private var selectedAircraft: Aircraft?
+    @State private var showAddEdit = false
+    @State private var searchText: String = ""
+    @StateObject var alertManager = AlertManager()
+    
     var groupedAircrafts: [String: [Aircraft]] {
         // Get favorite aircrafts
         let favoriteAircrafts = aircraftVM.aircraftList.filter { $0.isFavorite }
@@ -30,12 +35,6 @@ struct AircraftsView: View {
 
         return sortedGrouped
     }
-    
-    @State private var selectedAircraft: Aircraft?
-    @State private var showAddEdit = false
-    @State private var searchText: String = ""
-    @StateObject var alertManager = AlertManager()
-    
     
     var body: some View {
         VStack {

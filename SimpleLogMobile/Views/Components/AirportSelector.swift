@@ -12,11 +12,13 @@ struct AirportInputLine: View {
     @StateObject private var airportVM = AirportViewModel()
     
     @Binding var airport: Airport?
+    @State var label: String
     @State private var showAirportSelector = false
     
     var body: some View {
         HStack {
-            Text("Airport")
+            Text(label)
+                .frame(minWidth: 70, alignment: .leading)
             if let selectedAirport = airport {
                 Button {
                     onTapGesture()
@@ -24,13 +26,14 @@ struct AirportInputLine: View {
                     Text(selectedAirport.toString)
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .buttonStyle(.bordered)
             } else {
                 Button {
                     onTapGesture()
                 } label: {
-                    Text("Click to select an airport")
+                    Text("Select airport")
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
@@ -71,15 +74,6 @@ struct AirportSelector: View {
                         .autocorrectionDisabled()
                         .onChange(of: searchText, onChangeOfSearchText)
                         .focused($isSearchFieldFocused)
-                    Button {
-                        airport = nil
-                        showAddAirportSheet = true
-                    } label: {
-                        Image(systemName: "plus") // Use an Image
-                            .font(.system(size: 20, weight: .bold))
-                            .frame(width: 44, height: 20)
-                    }
-                    .buttonStyle(.bordered)
                 }
                 .padding(.horizontal)
                 .onAppear {
@@ -91,14 +85,25 @@ struct AirportSelector: View {
                 if !airportVM.airportList.isEmpty {
                     List {
                         ForEach($airportVM.airportList, id: \.self) { $airport in
-                            Text(airport.toString)
-                                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                                .background(Color.theme.background)
-                                .onTapGesture {
-                                    self.airport = airport
-                                    dismiss()
+                            HStack{
+                                Text(airport.toString)
+                                    .minimumScaleFactor(0.7)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                                    .background(Color.theme.background)
+                                    .onTapGesture {
+                                        self.airport = airport
+                                        dismiss()
+                                    }
+                                    .lineLimit(1)
+                                Button(action: {
+                                    try! airportVM.toggleFavorite(airport)
+                                }) {
+                                    Image(systemName: airport.isFavorite ? "star.fill" : "star")
+                                        .foregroundColor(airport.isFavorite ? .yellow : .gray)
+                                        .padding(.trailing, 8)
                                 }
-                                .lineLimit(1)
+                                .buttonStyle(BorderlessButtonStyle())
+                            }
                                 .onAppear {
                                     if airport == airportVM.airportList.last {
                                         try! airportVM.fetchAirportList(offset: airportVM.airportList.count, searchText: searchText)
@@ -138,6 +143,14 @@ struct AirportSelector: View {
                         dismiss()
                     }
                 }
+                
+                ToolbarItem(placement: .primaryAction) {
+                    Button(action: {
+                        showAddAirportSheet.toggle()
+                    }) {
+                        Text("New Airport")
+                    }
+                }
             }
             .navigationTitle("Airport Seach")
             .navigationBarTitleDisplayMode(.inline)
@@ -154,10 +167,13 @@ struct AirportSelector: View {
         
     }
     
+    
+    
     private func onChangeOfSearchText(oldValue: String , newValue: String) {
         try! airportVM.fetchAirportList(searchText: newValue, refresh: true, searchType: .beginsWithIcaoIata)
+        
         DispatchQueue.main.async {
-            if airportVM.airportList.count == 1 {
+            if AppSettings.autoSelectAirport && airportVM.airportList.count == 1 {
                 airport = airportVM.airportList[0]
                 dismiss()
             }

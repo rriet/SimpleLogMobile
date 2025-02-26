@@ -91,6 +91,21 @@ class CrewViewModel: ObservableObject {
         }
     }
     
+    func hasSelf() throws -> Bool {
+        let request = Crew.fetchRequest()
+        request.fetchLimit = 1
+        request.predicate = NSPredicate(format: "isSelf == %@", NSNumber(value: false))
+        
+        do {
+            let count = try viewContext.count(for: request)
+            return count > 0
+        } catch {
+            throw ErrorDetails(
+                title: "Error!",
+                message: "There was an unknown error reading from database.")
+        }
+    }
+    
     func getCrew(_ name: String) throws -> Crew? {
         let request = Crew.fetchRequest()
         request.fetchLimit = 1

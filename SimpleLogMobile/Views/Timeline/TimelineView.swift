@@ -14,7 +14,10 @@ struct TimelineView: View {
     
     @State private var showAddDialog = false
     @State private var showAddEditFlight = false
-    
+    @State private var showSearch = false
+    @State private var dateFrom: Date = Date()
+    @State private var dateTo: Date = Date()
+    @State private var searchText: String = ""
     @State private var selectedFlight: Flight?
     
     
@@ -23,7 +26,7 @@ struct TimelineView: View {
             VStack {
                 HStack{
                     Button {
-                        showAddDialog.toggle()
+                        showSearch.toggle()
                     } label: {
                         Image(systemName: "line.3.horizontal.decrease.circle")
                             .font(.system(size: 20, weight: .bold))
@@ -58,6 +61,58 @@ struct TimelineView: View {
                     }
                 }
                 .padding(.horizontal)
+                
+                if showSearch {
+                    VStack{
+                        ViewThatFits {
+                            HStack{
+                                InputDate(
+                                    title: "From",
+                                    dateStart: $dateFrom
+                                )
+                                Spacer().frame(minWidth: 0, maxWidth: 25)
+                                InputDate(
+                                    title: "To",
+                                    dateStart: $dateTo
+                                )
+                            }
+                            .padding(.horizontal)
+                            
+                            HStack{
+                                VStack{
+                                    Text("From")
+                                    InputDate(
+                                        title: "",
+                                        dateStart: $dateFrom
+                                    )
+                                }
+                                
+                                VStack{
+                                    Text("To")
+                                    InputDate(
+                                        title: "",
+                                        dateStart: $dateTo
+                                    )
+                                }
+                            }
+                            .padding(.horizontal)
+                        }
+                        HStack{
+                            Text("Search")
+                            TextField("Airport, Aircraft, Type, Crew or Remaks", text: $searchText)
+                                .autocorrectionDisabled(true)
+                                .minimumScaleFactor(0.8)
+                                .textFieldStyle(RoundedBorderTextFieldStyle())
+                                .onChange(of: searchText) { oldValue , newValue in
+                                    //                                filterCrewList()
+                                }
+                                
+                        }
+                        .padding(.horizontal)
+                    }
+                    
+                    
+                }
                     
                 if !timelineVM.timelineList.isEmpty {
                     List {
@@ -71,7 +126,8 @@ struct TimelineView: View {
                                             
                                         },
                                         onEdit: {
-
+                                            selectedFlight = event.flight
+                                            showAddEditFlight = true
                                         },
                                         onTapGesture: {
 
@@ -119,13 +175,6 @@ struct TimelineView: View {
                 
             }
         }
-        .floatingButton(
-            buttonContent: AnyView(
-                Image(systemName: "plus")
-                    .foregroundColor(.white)
-                    .font(.title)
-            ), action: {showAddDialog.toggle()})
-        
         .sheet(isPresented: $showAddEditFlight) {
             AddEditFlight($selectedFlight, timelineVM: timelineVM)
                 .interactiveDismissDisabled()

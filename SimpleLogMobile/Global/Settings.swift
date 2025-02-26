@@ -15,6 +15,8 @@ struct AppSettings {
         static let autoLockNewEntries = "autoLockNewEntries"
         static let logTakeOffAndLanding = "logTakeOffAndLanding"
         static let hourInputMode = "hourInputMode"
+        static let autoSelectAirport = "autoSelectAirport"
+        static let autoSelectAircraft = "autoSelectAircraft"
     }
     
     static var autoLockNewEntries: Bool {
@@ -50,5 +52,21 @@ struct AppSettings {
         }
     }
     
+    static var autoSelectAirport: Bool {
+        get {
+            defaults.bool(forKey: Keys.autoSelectAirport)
+        }
+        set {
+            defaults.set(newValue, forKey: Keys.autoSelectAirport)
+        }
+    }
     
+    static var autoSelectAircraft: Bool {
+        get {
+            defaults.bool(forKey: Keys.autoSelectAircraft)
+        }
+        set {
+            defaults.set(newValue, forKey: Keys.autoSelectAircraft)
+        }
+    }
 }

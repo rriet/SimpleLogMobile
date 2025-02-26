@@ -30,4 +30,14 @@ public class Flight: NSManagedObject, SwipeableItem, Comparable {
         let crew = self.flightCrew as? Set<FlightCrew> ?? []
         return crew.sorted()
     }
+    
+    func getCrewDictionary() -> [Crew: CrewPosition] {
+        var crewDict: [Crew: CrewPosition] = [:]
+        for flightCrew in flightCrewArray {
+            if let crew = flightCrew.crew {
+                crewDict[crew] = flightCrew.position
+            }
+        }
+        return crewDict
+    }
 }

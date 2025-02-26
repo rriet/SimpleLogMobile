@@ -45,4 +45,8 @@ public class Aircraft: NSManagedObject, SwipeableItem, Comparable {
         let sims = self.simTrainings as? Set<SimulatorTraining> ?? []
         return sims.sorted ()
     }
+    
+    var toString: String {
+        "\(self.registration ?? "") (\(self.aircraftType?.designator ?? ""))"
+    }
 }

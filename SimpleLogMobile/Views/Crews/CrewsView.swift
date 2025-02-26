@@ -15,6 +15,12 @@ struct CrewsView: View {
     @State private var searchText: String = ""
     @State private var filteredCrewList: [Crew] = []
     
+    @State private var selectedCrew: Crew?
+    @State private var showCallMessageEmail = false
+    @State private var showAddEdit = false
+    @State private var showLargeImage = false
+    @StateObject var alertManager = AlertManager()
+    
     var groupedFilteredCrewList: [String: [Crew]] {
         // Get favorite aircrafts
         let favoriteCrews = crewVM.crewList.filter { $0.isFavorite }
@@ -33,12 +39,6 @@ struct CrewsView: View {
 
         return sortedCrew
     }
-    
-    @State private var selectedCrew: Crew?
-    @State private var showCallMessageEmail = false
-    @State private var showAddEdit = false
-    @State private var showLargeImage = false
-    @StateObject var alertManager = AlertManager()
     
     var body: some View {
         ZStack{

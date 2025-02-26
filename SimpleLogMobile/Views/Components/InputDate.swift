@@ -16,7 +16,7 @@ struct InputDate: View {
         HStack {
             Text("\(title)")
             
-            Spacer()
+            Spacer().frame(minWidth: 0, maxWidth: 25)
             
             // Decrease date button
             Button(action: {
