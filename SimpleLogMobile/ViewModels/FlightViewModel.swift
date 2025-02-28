@@ -147,11 +147,11 @@ class FlightViewModel: ObservableObject {
         
         updateCrew(flightToEdit, crew: crew)
         
-        try save()
+        try viewContext.save()
     }
     
     private func updateCrew(_ flight: Flight, crew: [Crew: CrewPosition]) {
-        let currentCrew = flight.flightCrew as? Set<FlightCrew> ?? []
+        let currentCrew = flight.flightCrews as? Set<FlightCrew> ?? []
 
         if crew.isEmpty {
             // Remove all crew assignments
@@ -193,16 +193,6 @@ class FlightViewModel: ObservableObject {
             return try viewContext.fetch(request).first
         } catch {
             throw ErrorDetails(title: "Error!", message: "Unknown error reading from database.")
-        }
-    }
-    
-    private func save() throws {
-        do {
-            try viewContext.save()
-        } catch {
-            throw ErrorDetails(
-                title: "Error!",
-                message: "There was an unknown error saving to database.")
         }
     }
 }

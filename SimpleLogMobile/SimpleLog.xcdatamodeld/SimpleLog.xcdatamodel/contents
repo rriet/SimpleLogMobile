@@ -8,7 +8,7 @@
         <attribute name="registration" attributeType="String"/>
         <relationship name="aircraftType" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="AircraftType" inverseName="aircrafts" inverseEntity="AircraftType"/>
         <relationship name="flights" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="aircraft" inverseEntity="Flight"/>
-        <relationship name="simTrainings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SimulatorTraining" inverseName="aircraft" inverseEntity="SimulatorTraining"/>
+        <relationship name="simulatorTrainings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SimulatorTraining" inverseName="aircraft" inverseEntity="SimulatorTraining"/>
     </entity>
     <entity name="AircraftType" representedClassName="AircraftType" syncable="YES" codeGenerationType="category">
         <attribute name="categoryString" attributeType="String" defaultValueString="Landplane"/>
@@ -37,8 +37,8 @@
         <attribute name="name" optional="YES" attributeType="String" defaultValueString=""/>
         <relationship name="flightsArriving" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="airportArr" inverseEntity="Flight"/>
         <relationship name="flightsDeparting" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Flight" inverseName="airportDep" inverseEntity="Flight"/>
-        <relationship name="positioningArriving" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Positioning" inverseName="airportArr" inverseEntity="Positioning"/>
-        <relationship name="positioningDeparting" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Positioning" inverseName="airportDep" inverseEntity="Positioning"/>
+        <relationship name="positioningsArriving" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Positioning" inverseName="airportArr" inverseEntity="Positioning"/>
+        <relationship name="positioningsDeparting" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Positioning" inverseName="airportDep" inverseEntity="Positioning"/>
     </entity>
     <entity name="Crew" representedClassName="Crew" syncable="YES" codeGenerationType="category">
         <attribute name="email" optional="YES" attributeType="String" defaultValueString=""/>
@@ -49,8 +49,7 @@
         <attribute name="notes" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="phone" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="picture" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES"/>
-        <relationship name="flightCrew" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FlightCrew" inverseName="crew" inverseEntity="FlightCrew"/>
-        <relationship name="simTrainings" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SimulatorTraining"/>
+        <relationship name="flightCrews" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FlightCrew" inverseName="crew" inverseEntity="FlightCrew"/>
     </entity>
     <entity name="DutyPeriod" representedClassName="DutyPeriod" syncable="YES" codeGenerationType="category">
         <attribute name="factoredDutyTime" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
@@ -91,14 +90,14 @@
         <relationship name="aircraft" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="flights" inverseEntity="Aircraft"/>
         <relationship name="airportArr" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsArriving" inverseEntity="Airport"/>
         <relationship name="airportDep" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="flightsDeparting" inverseEntity="Airport"/>
-        <relationship name="flightCrew" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FlightCrew" inverseName="flight" inverseEntity="FlightCrew"/>
+        <relationship name="flightCrews" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FlightCrew" inverseName="flight" inverseEntity="FlightCrew"/>
         <relationship name="startTimeline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="flightStart" inverseEntity="Timeline"/>
     </entity>
     <entity name="FlightCrew" representedClassName="FlightCrew" syncable="YES" codeGenerationType="category">
         <attribute name="positionString" optional="YES" attributeType="String"/>
-        <relationship name="crew" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Crew" inverseName="flightCrew" inverseEntity="Crew"/>
-        <relationship name="flight" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Flight" inverseName="flightCrew" inverseEntity="Flight"/>
-        <relationship name="simulatorTraining" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SimulatorTraining" inverseName="flightCrew" inverseEntity="SimulatorTraining"/>
+        <relationship name="crew" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Crew" inverseName="flightCrews" inverseEntity="Crew"/>
+        <relationship name="flight" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Flight" inverseName="flightCrews" inverseEntity="Flight"/>
+        <relationship name="simulatorTraining" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SimulatorTraining" inverseName="flightCrews" inverseEntity="SimulatorTraining"/>
     </entity>
     <entity name="Positioning" representedClassName="Positioning" syncable="YES" codeGenerationType="category">
         <attribute name="dateEnd" attributeType="Date" usesScalarValueType="NO"/>
@@ -106,8 +105,8 @@
         <attribute name="isLocked" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="notes" optional="YES" attributeType="String"/>
         <attribute name="totalTime" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="airportArr" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="positioningArriving" inverseEntity="Airport"/>
-        <relationship name="airportDep" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="positioningDeparting" inverseEntity="Airport"/>
+        <relationship name="airportArr" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="positioningsArriving" inverseEntity="Airport"/>
+        <relationship name="airportDep" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Airport" inverseName="positioningsDeparting" inverseEntity="Airport"/>
         <relationship name="positioningStart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="positioningStart" inverseEntity="Timeline"/>
     </entity>
     <entity name="PreviousExperience" representedClassName="PreviousExperience" syncable="YES" codeGenerationType="category">
@@ -120,8 +119,8 @@
         <attribute name="notes" optional="YES" attributeType="String"/>
         <attribute name="remarks" optional="YES" attributeType="String" defaultValueString=""/>
         <attribute name="timeSession" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="aircraft" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="simTrainings" inverseEntity="Aircraft"/>
-        <relationship name="flightCrew" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FlightCrew" inverseName="simulatorTraining" inverseEntity="FlightCrew"/>
+        <relationship name="aircraft" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Aircraft" inverseName="simulatorTrainings" inverseEntity="Aircraft"/>
+        <relationship name="flightCrews" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="FlightCrew" inverseName="simulatorTraining" inverseEntity="FlightCrew"/>
         <relationship name="startTimeline" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Timeline" inverseName="simulatorStart" inverseEntity="Timeline"/>
     </entity>
     <entity name="Timeline" representedClassName="Timeline" syncable="YES" codeGenerationType="category">

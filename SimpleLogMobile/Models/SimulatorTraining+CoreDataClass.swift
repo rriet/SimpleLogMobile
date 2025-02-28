@@ -24,4 +24,13 @@ public class SimulatorTraining: NSManagedObject, SwipeableItem, Comparable {
     var dateStart: Date {
         self.startTimeline?.getDate ?? .now
     }
+    
+    var hasCrew: Bool {
+        !self.flightCrewArray.isEmpty
+    }
+    
+    var flightCrewArray: [FlightCrew] {
+        let crew = self.flightCrews as? Set<FlightCrew> ?? []
+        return crew.sorted()
+    }
 }

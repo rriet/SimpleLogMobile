@@ -13,7 +13,6 @@ class AirportViewModel: ObservableObject {
     private let viewContext = PersistenceController.shared.viewContext
     @Published var airportList: [Airport] = []
     private var batchSize = 20 // Number of airports to fetch per batch
-    private var isFetching = false // Prevent multiple fetches at once
     
     enum SearchType {
         case all
@@ -26,7 +25,6 @@ class AirportViewModel: ObservableObject {
     }
     
     func fetchAirportList(offset: Int = 0, searchText: String = "", refresh: Bool = false, searchType: SearchType = .all) throws {
-        guard !isFetching else { return }
         
         let request = Airport.fetchRequest()
         let sortStar = NSSortDescriptor(key: "isFavorite", ascending: false)
@@ -65,8 +63,6 @@ class AirportViewModel: ObservableObject {
             } else {
                 self.airportList.append(contentsOf: newAirports)
             }
-            
-            self.isFetching = false
         }
     }
     
@@ -125,7 +121,7 @@ class AirportViewModel: ObservableObject {
         airportToEdit.isFavorite = isFavorite
         airportToEdit.isLocked = isLocked
         
-        try save()
+        try viewContext.save()
     }
     
     func checkExist(_ icao: String) throws -> Bool {
@@ -184,12 +180,12 @@ class AirportViewModel: ObservableObject {
         
         // delete from database
         viewContext.delete(airportToDelete)
-        try save()
+        try viewContext.save()
     }
     
     func toggleLocked(_ airportToToggle: Airport) throws {
         airportToToggle.isLocked.toggle()
-        try save()
+        try viewContext.save()
     }
     
     func toggleFavorite(_ airportToToggle: Airport) throws {
@@ -207,16 +203,6 @@ class AirportViewModel: ObservableObject {
         }
         
         
-        try save()
-    }
-    
-    private func save() throws {
-        do {
-            try viewContext.save()
-        } catch {
-            throw ErrorDetails(
-                title: "Error!",
-                message: "There was an unknown error saving to database.")
-        }
+        try viewContext.save()
     }
 }

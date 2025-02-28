@@ -62,16 +62,29 @@ class SimulatorViewModel: ObservableObject {
             newSimualtorTraining.timeSession = Int16(timeSession)
             newSimualtorTraining.endorsementSignature = endorsementSignature
             
-            try save()
+            updateCrew(newSimualtorTraining, crew: crew)
+            
+            try viewContext.save()
     }
     
-    private func save() throws {
-        do {
-            try viewContext.save()
-        } catch {
-            throw ErrorDetails(
-                title: "Error!",
-                message: "There was an unknown error saving to database.")
+    private func updateCrew(_ simulatorTraining: SimulatorTraining, crew: [Crew: CrewPosition]) {
+        let currentCrew = simulatorTraining.flightCrews as? Set<FlightCrew> ?? []
+
+        if crew.isEmpty {
+            // Remove all crew assignments
+            currentCrew.forEach { viewContext.delete($0) }
+        } else {
+            // Update existing and add new crew members
+            crew.forEach { (crewMember, position) in
+                if let existingAssignment = currentCrew.first(where: { $0.crew == crewMember }) {
+                    existingAssignment.position = position
+                } else {
+                    let newAssignment = FlightCrew(context: viewContext)
+                    newAssignment.simulatorTraining = simulatorTraining
+                    newAssignment.crew = crewMember
+                    newAssignment.position = position
+                }
+            }
         }
     }
 }

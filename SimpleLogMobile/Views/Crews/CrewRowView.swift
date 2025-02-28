@@ -67,6 +67,8 @@ struct CrewRowView: View {
             .contentShape(Rectangle())
             .onTapGesture {onTapGesture()}
             
+            Text("Flights: \(crew.simTrainingArray.count)")
+            
             Button(action: onToggleFavorite) {
                 Image(systemName: crew.isFavorite ? "star.fill" : "star")
                     .foregroundColor(crew.isFavorite ? .yellow : .gray)

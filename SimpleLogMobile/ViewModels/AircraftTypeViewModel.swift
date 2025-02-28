@@ -126,7 +126,7 @@ class AircraftTypeViewModel: ObservableObject {
         typeToEdit.highPerformance = highPerformance
         typeToEdit.isLocked = isLocked
         
-        try save()
+        try viewContext.save()
     }
     
     func checkExist(_ designator: String) throws -> Bool {
@@ -182,22 +182,11 @@ class AircraftTypeViewModel: ObservableObject {
         }
         
         viewContext.delete(typeToDelete)
-        try save()
+        try viewContext.save()
     }
     
     func toggleLocked(_ typeToToggle: AircraftType) throws {
         typeToToggle.isLocked.toggle()
-        try save()
-    }
-    
-    
-    private func save() throws {
-        do {
-            try viewContext.save()
-        } catch {
-            throw ErrorDetails(
-                title: "Error!",
-                message: "There was an unknown error saving to database.")
-        }
+        try viewContext.save()
     }
 }

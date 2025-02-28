@@ -27,7 +27,7 @@ public class Flight: NSManagedObject, SwipeableItem, Comparable {
     }
     
     var flightCrewArray: [FlightCrew] {
-        let crew = self.flightCrew as? Set<FlightCrew> ?? []
+        let crew = self.flightCrews as? Set<FlightCrew> ?? []
         return crew.sorted()
     }
     

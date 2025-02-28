@@ -158,7 +158,6 @@ struct TimelineView: View {
                                 .frame(height: 100)
                                 .listRowBackground(Color.clear)
                         }
-                        
                     }
                     
                 } else {
@@ -180,7 +179,7 @@ struct TimelineView: View {
                 .interactiveDismissDisabled()
         }
         .onAppear {
-            try! timelineVM.fetchTimelineList(refresh: true)
+            try! timelineVM.fetchTimelineList()
         }
     }
     

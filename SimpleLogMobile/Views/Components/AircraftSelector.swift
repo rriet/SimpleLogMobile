@@ -26,6 +26,7 @@ struct AircraftInputLine: View {
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(.theme.foreground)
                 }
                 .buttonStyle(.bordered)
             } else {
@@ -35,7 +36,7 @@ struct AircraftInputLine: View {
                     Text("Select aircraft")
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundColor(.theme.secondaryForeground)
+                        .foregroundColor(.red)
                 }
                 .buttonStyle(.bordered)
             }

@@ -42,7 +42,7 @@ public class Aircraft: NSManagedObject, SwipeableItem, Comparable {
     }
     
     var simTrainingArray: [SimulatorTraining] {
-        let sims = self.simTrainings as? Set<SimulatorTraining> ?? []
+        let sims = self.simulatorTrainings as? Set<SimulatorTraining> ?? []
         return sims.sorted ()
     }
     

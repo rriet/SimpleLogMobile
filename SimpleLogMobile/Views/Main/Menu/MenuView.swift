@@ -45,7 +45,6 @@ struct MenuView: View {
             
         }
         .listStyle(.sidebar)
-#if os(iOS)
         /// Closes the iPad menu if the tablet is in Portrait
         .onChange(of: selectedMenuItem) {
             if UIDevice.current.userInterfaceIdiom == .pad,
@@ -60,6 +59,5 @@ struct MenuView: View {
                 columnVisibility = .automatic
             }
         }
-#endif
     }
 }

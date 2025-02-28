@@ -9,16 +9,16 @@ import SwiftUI
 
 @main
 struct SimpleLogMobileApp: App {
-    let persistenceController = PersistenceController.shared
+//    let viewContext = PersistenceController.shared.container.viewContext
 
     var body: some Scene {
         WindowGroup {
             MainView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+//                .environment(\.managedObjectContext, viewContext)
         }
     }
     
     init() {
-        print(URL.applicationSupportDirectory.path(percentEncoded: false))
+//        print(URL.applicationSupportDirectory.path(percentEncoded: false))
     }
 }

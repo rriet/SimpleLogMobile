@@ -188,7 +188,7 @@ struct AddEditCrewView: View {
         do {
             if crewToEdit == nil {
                 // Adding a new Crew
-                try crewVM.addCrew(
+                _ = try crewVM.addCrew(
                     name: name,
                     email: email,
                     phone: phone,

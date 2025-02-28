@@ -43,12 +43,12 @@ public class Airport: NSManagedObject, SwipeableItem, Comparable {
     }
     
     var positioningDepartingArray: [Positioning] {
-        let positioningDeparting = self.positioningDeparting as? Set<Positioning> ?? []
+        let positioningDeparting = self.positioningsDeparting as? Set<Positioning> ?? []
         return positioningDeparting.sorted ()
     }
     
     var positioningArrivingArray: [Positioning] {
-        let positioningArriving = self.positioningArriving as? Set<Positioning> ?? []
+        let positioningArriving = self.positioningsArriving as? Set<Positioning> ?? []
         return positioningArriving.sorted ()
     }
     

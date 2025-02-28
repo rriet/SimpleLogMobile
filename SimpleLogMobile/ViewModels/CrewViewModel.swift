@@ -12,18 +12,29 @@ class CrewViewModel: ObservableObject {
     
     private let viewContext = PersistenceController.shared.viewContext
     @Published var crewList: [Crew] = []
+    private var batchSize = 20
     
-    func fetchCrewList() throws {
+    func fetchCrewList(offset: Int = 0, searchText: String = "", refresh: Bool = false) throws {
         let request = Crew.fetchRequest()
-        let sort = NSSortDescriptor(key: "name", ascending: true)
-        request.sortDescriptors = [sort]
+        let sortStar = NSSortDescriptor(key: "isFavorite", ascending: false)
+        let sortName = NSSortDescriptor(key: "name", ascending: true)
+        request.sortDescriptors = [sortStar, sortName]
+        request.fetchLimit = batchSize
+        request.fetchOffset = offset
         
-        do {
-            crewList = try viewContext.fetch(request)
-        }catch {
-            throw ErrorDetails(
-                title: "Error!",
-                message: "Unknown error fetching crew.")
+        if !searchText.isEmpty {
+            request.predicate = NSPredicate(
+                format: "(name CONTAINS[cd] %@) OR (phone CONTAINS[cd] %@) OR (email CONTAINS[cd] %@) OR (notes CONTAINS[cd] %@)",
+                searchText, searchText, searchText, searchText)
+        }
+        
+        let newCrewList = try viewContext.fetch(request)
+        DispatchQueue.main.async {
+            if refresh {
+                self.crewList = newCrewList
+            } else {
+                self.crewList.append(contentsOf: newCrewList)
+            }
         }
     }
     
@@ -73,7 +84,7 @@ class CrewViewModel: ObservableObject {
         crewToEdit.isLocked = isLocked
         crewToEdit.isFavorite = isFavorite
         
-        try save()
+        try viewContext.save()
     }
     
     func checkExist(_ name: String) throws -> Bool {
@@ -141,12 +152,12 @@ class CrewViewModel: ObservableObject {
         }
         
         viewContext.delete(crewToDelete)
-        try save()
+        try viewContext.save()
     }
     
     func toggleLocked(_ crewToToggle: Crew) throws {
         crewToToggle.isLocked.toggle()
-        try save()
+        try viewContext.save()
     }
     
     func toggleFavorite(_ crewToToggle: Crew) throws {
@@ -163,16 +174,6 @@ class CrewViewModel: ObservableObject {
             return $0.name ?? "" < $1.name ?? ""
         }
         
-        try save()
-    }
-    
-    private func save() throws {
-        do {
-            try viewContext.save()
-        } catch {
-            throw ErrorDetails(
-                title: "Error!",
-                message: "There was an unknown error saving to database.")
-        }
+        try viewContext.save()
     }
 }

@@ -27,6 +27,7 @@ struct AirportInputLine: View {
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(.theme.foreground)
                 }
                 .buttonStyle(.bordered)
             } else {
@@ -36,6 +37,7 @@ struct AirportInputLine: View {
                     Text("Select airport")
                         .lineLimit(1)
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundColor(.red)
                 }
                 .buttonStyle(.bordered)
                 

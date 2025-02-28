@@ -77,27 +77,15 @@ struct AirportsView: View {
                 }
                 .listSectionSpacing(10)
             } else {
-                if (searchText.isEmpty) {
-                    Text("No Airports in the database.")
-                        .font(.subheadline)
-                        .foregroundColor(Color.theme.foreground)
-                        .frame(
-                            maxWidth: .infinity,
-                            maxHeight: .infinity,
-                            alignment: .center
-                        )
-                        .background(Color.theme.secondaryBackground)
-                } else {
-                    Text("No Airports matching the search criteria.")
-                        .font(.subheadline)
-                        .foregroundColor(Color.theme.foreground)
-                        .frame(
-                            maxWidth: .infinity,
-                            maxHeight: .infinity,
-                            alignment: .center
-                        )
-                        .background(Color.theme.secondaryBackground)
-                }
+                Text(searchText.isEmpty ? "No Airports in the database." : "No Airports matching the search criteria.")
+                    .font(.subheadline)
+                    .foregroundColor(Color.theme.foreground)
+                    .frame(
+                        maxWidth: .infinity,
+                        maxHeight: .infinity,
+                        alignment: .center
+                    )
+                    .background(Color.theme.secondaryBackground)
             }
         }
         .alert(item: $alertManager.currentAlert) { alertInfo in
@@ -116,7 +104,7 @@ struct AirportsView: View {
             ShowMapView(airport: $selectedAirport)
         }
         .onAppear{
-            try! airportVM.fetchAirportList(refresh: true)
+            try! airportVM.fetchAirportList()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(Color.theme.secondaryBackground))

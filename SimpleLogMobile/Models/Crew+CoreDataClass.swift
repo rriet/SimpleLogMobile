@@ -25,7 +25,7 @@ public class Crew: NSManagedObject, SwipeableItem, Comparable {
     }
     
     var flightsArray: [Flight] {
-        let flightCrewSet = self.flightCrew as? Set<FlightCrew> ?? []
+        let flightCrewSet = self.flightCrews as? Set<FlightCrew> ?? []
         let flights = flightCrewSet.compactMap { $0.flight }
         return flights.sorted()
     }
@@ -35,8 +35,9 @@ public class Crew: NSManagedObject, SwipeableItem, Comparable {
     }
     
     var simTrainingArray: [SimulatorTraining] {
-        let sims = self.simTrainings as? Set<SimulatorTraining> ?? []
-        return sims.sorted ()
+        let flightCrewSet = self.flightCrews as? Set<FlightCrew> ?? []
+        let sims = flightCrewSet.compactMap { $0.simulatorTraining }
+        return sims.sorted()
     }
     
     var initials:String {

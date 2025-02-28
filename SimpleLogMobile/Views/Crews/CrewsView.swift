@@ -13,7 +13,7 @@ struct CrewsView: View {
     @StateObject private var crewVM = CrewViewModel()
     
     @State private var searchText: String = ""
-    @State private var filteredCrewList: [Crew] = []
+//    @State private var filteredCrewList: [Crew] = []
     
     @State private var selectedCrew: Crew?
     @State private var showCallMessageEmail = false
@@ -21,80 +21,58 @@ struct CrewsView: View {
     @State private var showLargeImage = false
     @StateObject var alertManager = AlertManager()
     
-    var groupedFilteredCrewList: [String: [Crew]] {
-        // Get favorite aircrafts
-        let favoriteCrews = crewVM.crewList.filter { $0.isFavorite }
-
-        var sortedCrew: [String: [Crew]] = [:]
-        if !favoriteCrews.isEmpty {
-            sortedCrew["Favorites"] = favoriteCrews
-        }
-        
-        let groupedCrew = Dictionary(grouping: filteredCrewList) { crew in
-            guard let name = crew.name, !name.isEmpty else { return "" }
-            return String(name.prefix(1)).uppercased()
-        }
-        
-        sortedCrew.merge(groupedCrew) { current, _ in current }
-
-        return sortedCrew
-    }
-    
     var body: some View {
         ZStack{
             VStack {
-                if !crewVM.crewList.isEmpty {
-                    HStack {
-                        Text("Crew")
-                            .font(.headline)
-                        TextField("Name, email, phone or notes", text: $searchText)
-                            .autocorrectionDisabled(true)
-                            .minimumScaleFactor(0.8)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                            .onChange(of: searchText) { oldValue , newValue in
-                                filterCrewList()
-                            }
-                        Button {
-                            newCrew()
-                        } label: {
-                            Image(systemName: "plus")
-                                .font(.system(size: 20, weight: .bold))
-                                .frame(width: 34, height: 34)
+                HStack {
+                    Text("Crew")
+                        .font(.headline)
+                    TextField("Name, email, phone or notes", text: $searchText)
+                        .autocorrectionDisabled(true)
+                        .minimumScaleFactor(0.8)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .onChange(of: searchText) { oldValue , newValue in
+                            try! crewVM.fetchCrewList(searchText: newValue, refresh: true)
                         }
+                    Button {
+                        newCrew()
+                    } label: {
+                        Image(systemName: "plus")
+                            .font(.system(size: 20, weight: .bold))
+                            .frame(width: 34, height: 34)
                     }
-                    .padding(.horizontal)
-                    if !filteredCrewList.isEmpty {
+                }
+                .padding(.horizontal)
+                if !crewVM.crewList.isEmpty {
+                    if !crewVM.crewList.isEmpty {
                         List {
-                            ForEach(groupedFilteredCrewList.keys.sorted{ (key1, key2) -> Bool in
-                                if key1 == "Favorites" { return true }
-                                if key2 == "Favorites" { return false }
-                                return key1 < key2
-                            }, id: \.self) { fistLetter in
-                                Section(header: Text(fistLetter)) {
-                                    ForEach(groupedFilteredCrewList[fistLetter] ?? [], id: \.self) { crew in
-                                        CrewRowView(
-                                            crew: crew,
-                                            onDelete: {
-                                                deleteCrew(crew)
-                                            },
-                                            onEdit: {
-                                                editCrew(crew)
-                                            },
-                                            onTapGesture: {
-                                                callEmail(crew)
-                                            },
-                                            onToggleLock: {
-                                                try! crewVM.toggleLocked(crew)
-                                            },
-                                            onImageTapGesture: {
-                                                selectedCrew = crew
-                                                showLargeImage = true
-                                            },
-                                            onToggleFavorite: {
-                                                try! crewVM.toggleFavorite(crew)
-                                            })
+                            ForEach(crewVM.crewList, id: \.self) { crew in
+                                CrewRowView(
+                                    crew: crew,
+                                    onDelete: {
+                                        deleteCrew(crew)
+                                    },
+                                    onEdit: {
+                                        editCrew(crew)
+                                    },
+                                    onTapGesture: {
+                                        callEmail(crew)
+                                    },
+                                    onToggleLock: {
+                                        try! crewVM.toggleLocked(crew)
+                                    },
+                                    onImageTapGesture: {
+                                        selectedCrew = crew
+                                        showLargeImage = true
+                                    },
+                                    onToggleFavorite: {
+                                        try! crewVM.toggleFavorite(crew)
+                                    })
+                                    .onAppear {
+                                        if crew == crewVM.crewList.last {
+                                            try! crewVM.fetchCrewList(offset: crewVM.crewList.count, searchText: searchText)
+                                        }
                                     }
-                                }
                             }
                             // Spacer to allow last entry to scroll pass the + button
                             Section {
@@ -117,7 +95,7 @@ struct CrewsView: View {
                             .background(Color.theme.secondaryBackground)
                     }
                 } else {
-                    Text("No Crew to display.")
+                    Text(searchText.isEmpty ? "No Crew in the database." : "No Crew matching the search criteria.")
                         .font(.subheadline)
                         .foregroundColor(Color.theme.foreground)
                         .frame(
@@ -140,9 +118,9 @@ struct CrewsView: View {
             }
         }
         .onAppear {
-            filterCrewList()
+//            filterCrewList()
         }
-        .onChange(of: crewVM.crewList, filterCrewList)
+//        .onChange(of: crewVM.crewList, filterCrewList)
         .alert(item: $alertManager.currentAlert) { alertInfo in
             alertManager.getAlert(alertInfo)
         }
@@ -177,21 +155,21 @@ struct CrewsView: View {
         showCallMessageEmail = true
     }
     
-    private func filterCrewList() {
-        if searchText.isEmpty {
-            filteredCrewList = crewVM.crewList
-            if (filteredCrewList.isEmpty) {
-                try! crewVM.addCrew(name: "Self")
-            }
-        } else {
-            filteredCrewList = crewVM.crewList.filter { crew in
-                crew.name.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
-                crew.phone.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
-                crew.email.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
-                crew.notes.strUnwrap.localizedCaseInsensitiveContains(searchText)
-            }
-        }
-    }
+//    private func filterCrewList() {
+//        if searchText.isEmpty {
+//            filteredCrewList = crewVM.crewList
+//            if (filteredCrewList.isEmpty) {
+//                _ = try! crewVM.addCrew(name: "Self")
+//            }
+//        } else {
+//            filteredCrewList = crewVM.crewList.filter { crew in
+//                crew.name.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
+//                crew.phone.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
+//                crew.email.strUnwrap.localizedCaseInsensitiveContains(searchText) ||
+//                crew.notes.strUnwrap.localizedCaseInsensitiveContains(searchText)
+//            }
+//        }
+//    }
     
     private func deleteCrew(_ crewToDelete: Crew) {
         
@@ -218,7 +196,7 @@ struct CrewsView: View {
                 do {
                     try crewVM.deleteCrew(crewToDelete)
                     try crewVM.fetchCrewList()
-                    filterCrewList()
+//                    filterCrewList()
                 } catch let details as ErrorDetails {
                     alertManager.showAlert(.error(details: details))
                 } catch {

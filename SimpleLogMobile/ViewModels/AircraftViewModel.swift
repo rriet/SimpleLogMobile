@@ -103,7 +103,7 @@ class AircraftViewModel: ObservableObject {
         aircraftToEdit.isLocked = isLocked
         aircraftToEdit.isFavorite = isFavorite
         
-        try save()
+        try viewContext.save()
     }
     
     func checkExist(_ registration: String) throws -> Bool {
@@ -157,12 +157,12 @@ class AircraftViewModel: ObservableObject {
         }
         
         viewContext.delete(aircraftToDelete)
-        try save()
+        try viewContext.save()
     }
     
     func toggleLocked(_ typeToToggle: Aircraft) throws {
         typeToToggle.isLocked.toggle()
-        try save()
+        try viewContext.save()
     }
     
     func toggleFavorite(_ aircraftToToggle: Aircraft) throws {
@@ -179,16 +179,6 @@ class AircraftViewModel: ObservableObject {
             return $0.registration ?? "" < $1.registration ?? ""
         }
         
-        try save()
-    }
-    
-    private func save() throws {
-        do {
-            try viewContext.save()
-        } catch {
-            throw ErrorDetails(
-                title: "Error!",
-                message: "There was an unknown error saving to database.")
-        }
+        try viewContext.save()
     }
 }
