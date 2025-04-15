@@ -148,7 +148,11 @@ struct TimelineView: View {
                             }
                             .onAppear {
                                 if event == timelineVM.timelineList.last {
-                                    try! timelineVM.fetchTimelineList(offset: timelineVM.timelineList.count)
+                                    do {
+                                        try timelineVM.fetchTimelineList(offset: timelineVM.timelineList.count)
+                                    } catch {
+                                        handleError(error)
+                                    }
                                 }
                             }
                         }
@@ -179,7 +183,11 @@ struct TimelineView: View {
                 .interactiveDismissDisabled()
         }
         .onAppear {
-            try! timelineVM.fetchTimelineList()
+            do {
+                try timelineVM.fetchTimelineList(refresh: true)
+            } catch {
+                handleError(error)
+            }
         }
     }
     

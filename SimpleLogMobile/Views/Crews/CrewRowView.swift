@@ -47,6 +47,7 @@ struct CrewRowView: View {
                     .minimumScaleFactor(0.8)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.top)
+                    
                 if !crew.phone.strUnwrap.isEmpty {
                     Text("Phone: \(crew.phone.strUnwrap)")
                         .lineLimit(1)
@@ -67,14 +68,19 @@ struct CrewRowView: View {
             .contentShape(Rectangle())
             .onTapGesture {onTapGesture()}
             
-            Text("Flights: \(crew.simTrainingArray.count)")
+//            Text("Flights: \(crew.simTrainingArray.count)")
             
-            Button(action: onToggleFavorite) {
-                Image(systemName: crew.isFavorite ? "star.fill" : "star")
-                    .foregroundColor(crew.isFavorite ? .yellow : .gray)
-                    .padding(.trailing, 8)
+            if crew.isSelf {
+                
+                Text("(Self)")
+            } else {
+                Button(action: onToggleFavorite) {
+                    Image(systemName: crew.isFavorite ? "star.fill" : "star")
+                        .foregroundColor(crew.isFavorite ? .yellow : .gray)
+                        .padding(.trailing, 8)
+                }
+                .buttonStyle(BorderlessButtonStyle())
             }
-            .buttonStyle(BorderlessButtonStyle())
             
         }
         .frame(maxWidth: .infinity, minHeight: 70)

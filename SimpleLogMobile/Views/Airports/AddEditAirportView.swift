@@ -26,7 +26,7 @@ struct AddEditAirportView: View {
     @State private var longitude: Double = 0
     @State private var isFavorite: Bool = false
     
-    @StateObject var alertManager = AlertManager()
+    @StateObject private var alertManager = AlertManager.shared
     
     @State private var showMapPickerView: Bool = false
     
@@ -128,10 +128,6 @@ struct AddEditAirportView: View {
                 airportToEdit == nil ? "Add Airport" : "Edit Airport"
             )
             .navigationBarTitleDisplayMode(.inline)
-            
-            .alert(item: $alertManager.currentAlert) { alertInfo in
-                alertManager.getAlert(alertInfo)
-            }
             .sheet(isPresented: $showMapPickerView) {
                 MapPickerView(
                     latitude: $latitude,
@@ -195,16 +191,8 @@ struct AddEditAirportView: View {
                 airportToEdit = newAirport
             }
             onSave()
-        } catch let details as ErrorDetails {
-            // Handle specific error details
-            alertManager.showAlert(.error(details: details))
-            return
         } catch {
-            // Handle unexpected errors
-            alertManager.showAlert(.simple(
-                title: "Unexpected Error",
-                message: error.localizedDescription
-            ))
+            handleError(error)
             return
         }
         

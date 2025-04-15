@@ -108,7 +108,7 @@ class AirportViewModel: ObservableObject {
         if icao.trimmingCharacters(in: .whitespaces).count < 3 {
             throw ErrorDetails(
                 title: "Invalid ICAO",
-                message: "ICAO code must be at least 3 characters long.")
+                message: "ICAO code must be at least 3 characters long.",severity: .error)
         }
         
         airportToEdit.icao = icao.uppercased().trimmingCharacters(in: .whitespaces)
@@ -135,7 +135,7 @@ class AirportViewModel: ObservableObject {
         } catch {
             throw ErrorDetails(
                 title: "Error!",
-                message: "There was an unknown error reading from database.")
+                message: "There was an unknown error reading from database.",severity: .error)
         }
     }
     
@@ -150,7 +150,7 @@ class AirportViewModel: ObservableObject {
         } catch {
             throw ErrorDetails(
                 title: "Error!",
-                message: "There was an unknown error reading from the database.")
+                message: "There was an unknown error reading from the database.",severity: .error)
         }
     }
     
@@ -158,19 +158,19 @@ class AirportViewModel: ObservableObject {
         guard !airportToDelete.isLocked else {
             throw ErrorDetails(
                 title: "Airport Locked",
-                message: "The selected Airport cannot be deleted because it is locked.")
+                message: "The selected Airport cannot be deleted because it is locked.",severity: .error)
         }
         
         guard !airportToDelete.hasFlights else {
             throw ErrorDetails(
                 title: "Cannot Delete Airport",
-                message: "The selected Airport cannot be deleted because it is associated with one or more Flight.")
+                message: "The selected Airport cannot be deleted because it is associated with one or more Flight.",severity: .error)
         }
         
         guard !airportToDelete.hasPositioning else {
             throw ErrorDetails(
                 title: "Cannot Delete Airport",
-                message: "The selected Airport cannot be deleted because it is associated with one or more Positioning trip.")
+                message: "The selected Airport cannot be deleted because it is associated with one or more Positioning trip.",severity: .error)
         }
         
         // remove the airport from the list
@@ -186,6 +186,12 @@ class AirportViewModel: ObservableObject {
     func toggleLocked(_ airportToToggle: Airport) throws {
         airportToToggle.isLocked.toggle()
         try viewContext.save()
+        
+        // Find and update the item in the list
+        if let index = airportList.firstIndex(where: { $0.objectID == airportToToggle.objectID }) {
+            let updatedObject = try viewContext.existingObject(with: airportToToggle.objectID) as! Airport
+            airportList[index] = updatedObject
+        }
     }
     
     func toggleFavorite(_ airportToToggle: Airport) throws {

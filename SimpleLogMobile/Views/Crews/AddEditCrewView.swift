@@ -23,11 +23,12 @@ struct AddEditCrewView: View {
     @State private var notes: String = ""
     @State private var picture: Data? = nil
     @State private var isFavorite: Bool = false
+    @State private var isSelf: Bool = false
     
     @State private var showImagePickerOptions = false
     @State private var showImagePicker = false
     @State private var isCamera = false
-    @StateObject var alertManager = AlertManager()
+    @StateObject private var alertManager = AlertManager.shared
     
     init(_ crew: Binding<Crew?>, crewVM: CrewViewModel) {
         self.crewVM = crewVM
@@ -105,6 +106,11 @@ struct AddEditCrewView: View {
                         .font(.title2)
                 }
                 
+                Toggle(isOn: $isSelf) {
+                    Text("Self")
+                        .font(.title2)
+                }
+                
             }
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -123,10 +129,6 @@ struct AddEditCrewView: View {
             }
             .navigationTitle(crewToEdit == nil ? "Add Crew" : "Edit Crew")
             .navigationBarTitleDisplayMode(.inline)
-            
-            .alert(item: $alertManager.currentAlert) { alertInfo in
-                alertManager.getAlert(alertInfo)
-            }
             .sheet(isPresented: $showImagePicker) {
                 ImagePicker(sourceType: isCamera ? .camera : .photoLibrary) { image in
                     if let image = image {
@@ -151,6 +153,7 @@ struct AddEditCrewView: View {
         notes = receivedCrew.notes.strUnwrap
         picture = receivedCrew.picture
         isFavorite = receivedCrew.isFavorite
+        isSelf = receivedCrew.isSelf
         
     }
     
@@ -194,7 +197,8 @@ struct AddEditCrewView: View {
                     phone: phone,
                     notes: notes,
                     picture: picture,
-                    isFavorite: isFavorite
+                    isFavorite: isFavorite,
+                    isSelf: isSelf
                     )
             } else {
                 // Editing an existing aircraft type
@@ -205,20 +209,20 @@ struct AddEditCrewView: View {
                     phone: phone,
                     notes: notes,
                     picture: picture,
-                    isFavorite: isFavorite
+                    isFavorite: isFavorite,
+                    isSelf: isSelf
                 )
             }
-            try crewVM.fetchCrewList()
         } catch let details as ErrorDetails {
             // Handle specific error details
-            alertManager.showAlert(.error(details: details))
+            alertManager.showAlert(title: details.title, message: details.message)
             return
         } catch {
             // Handle unexpected errors
-            alertManager.showAlert(.simple(
+            alertManager.showAlert(
                 title: "Unexpected Error",
                 message: error.localizedDescription
-            ))
+            )
             return
         }
         

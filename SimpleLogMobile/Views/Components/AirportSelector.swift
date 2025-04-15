@@ -79,7 +79,11 @@ struct AirportSelector: View {
                 }
                 .padding(.horizontal)
                 .onAppear {
-                    try! airportVM.fetchAirportList()
+                    do {
+                        try airportVM.fetchAirportList()
+                    } catch {
+                        handleError(error)
+                    }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {  // Slight delay to ensure focus works
                         isSearchFieldFocused = true
                     }
@@ -98,7 +102,11 @@ struct AirportSelector: View {
                                     }
                                     .lineLimit(1)
                                 Button(action: {
-                                    try! airportVM.toggleFavorite(airport)
+                                    do {
+                                        try airportVM.toggleFavorite(airport)
+                                    } catch {
+                                        handleError(error)
+                                    }
                                 }) {
                                     Image(systemName: airport.isFavorite ? "star.fill" : "star")
                                         .foregroundColor(airport.isFavorite ? .yellow : .gray)
@@ -108,7 +116,11 @@ struct AirportSelector: View {
                             }
                                 .onAppear {
                                     if airport == airportVM.airportList.last {
-                                        try! airportVM.fetchAirportList(offset: airportVM.airportList.count, searchText: searchText)
+                                        do {
+                                            try airportVM.fetchAirportList(offset: airportVM.airportList.count, searchText: searchText)
+                                        } catch {
+                                            handleError(error)
+                                        }
                                     }
                                 }
                             
@@ -148,6 +160,7 @@ struct AirportSelector: View {
                 
                 ToolbarItem(placement: .primaryAction) {
                     Button(action: {
+                        airport = nil
                         showAddAirportSheet.toggle()
                     }) {
                         Text("New Airport")
@@ -172,8 +185,11 @@ struct AirportSelector: View {
     
     
     private func onChangeOfSearchText(oldValue: String , newValue: String) {
-        try! airportVM.fetchAirportList(searchText: newValue, refresh: true, searchType: .beginsWithIcaoIata)
-        
+        do {
+            try airportVM.fetchAirportList(searchText: newValue, refresh: true, searchType: .beginsWithIcaoIata)
+        } catch {
+            handleError(error)
+        }
         DispatchQueue.main.async {
             if AppSettings.autoSelectAirport && airportVM.airportList.count == 1 {
                 airport = airportVM.airportList[0]

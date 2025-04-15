@@ -16,7 +16,7 @@ struct AircraftsView: View {
     @State private var selectedAircraft: Aircraft?
     @State private var showAddEdit = false
     @State private var searchText: String = ""
-    @StateObject var alertManager = AlertManager()
+    @StateObject private var alertManager = AlertManager.shared
     
     var groupedAircrafts: [String: [Aircraft]] {
         // Get favorite aircrafts
@@ -77,10 +77,19 @@ struct AircraftsView: View {
                                         
                                     },
                                     onToggleLock: {
-                                        try! aircraftVM.toggleLocked(aircraft)
+                                        
+                                        do {
+                                            try aircraftVM.toggleLocked(aircraft)
+                                        } catch {
+                                            handleError(error)
+                                        }
                                     },
                                     onToggleFavorite: {
-                                        try! aircraftVM.toggleFavorite(aircraft)
+                                        do {
+                                            try aircraftVM.toggleFavorite(aircraft)
+                                        } catch {
+                                            handleError(error)
+                                        }
                                     })
                             }
                         }
@@ -105,9 +114,6 @@ struct AircraftsView: View {
                     .background(Color.theme.secondaryBackground)
             }
         }
-        .alert(item: $alertManager.currentAlert) { alertInfo in
-            alertManager.getAlert(alertInfo)
-        }
         // Hides the background of the list, so the color propagates from the back
         .scrollContentBackground(.hidden)
         
@@ -116,7 +122,12 @@ struct AircraftsView: View {
         .sheet(isPresented: $showAddEdit) {
             AddEditAircraftView($selectedAircraft, onSave: {
                 refreshList()
-                try! aircraftTypeVM.fetchTypeList()
+                
+                do {
+                    try aircraftTypeVM.fetchTypeList()
+                } catch {
+                    handleError(error)
+                }
             })
                 .interactiveDismissDisabled()
         }
@@ -129,36 +140,39 @@ struct AircraftsView: View {
         do {
             try aircraftVM.fetchAircraftList()
         } catch {
-            alertManager.showAlert(.simple(
+            alertManager.showAlert(
                 title: "Unexpected error:",
-                message: error.localizedDescription))
+                message: error.localizedDescription)
         }
     }
     
     private func onChangeOfSearchText(oldValue: String , newValue: String) {
-        
-        try! aircraftVM.fetchAircraftList(searchString: newValue, includeType: true)
+        do {
+            try aircraftVM.fetchAircraftList(searchString: newValue, includeType: true)
+        } catch {
+            handleError(error)
+        }
     }
     
     private func deleteAircraft(_ aircraftToDelete: Aircraft) {
         
         // Verify if type has associated flight
         if aircraftToDelete.hasFlights {
-            alertManager.showAlert(.simple(
+            alertManager.showAlert(
                 title: "Cannot Delete Aircraft",
-                message: "The selected Aircraft cannot be deleted because it is associated with one or more flights."))
+                message: "The selected Aircraft cannot be deleted because it is associated with one or more flights.")
             return
         }
         
         // Verify if type has associated simulator
         if aircraftToDelete.hasSimTrainingArray {
-            alertManager.showAlert(.simple(
+            alertManager.showAlert(
                 title: "Cannot Delete Aircraft",
-                message: "The selected Aircraft cannot be deleted because it is associated with one or more Simulator Trining."))
+                message: "The selected Aircraft cannot be deleted because it is associated with one or more Simulator Trining.")
             return
         }
         
-        alertManager.showAlert(.confirmation(
+        alertManager.showAlert(
             title: "Delete Aircraft",
             message: "Are you sure you want to delete this Aircraft?",
             confirmAction: {
@@ -167,14 +181,14 @@ struct AircraftsView: View {
                     try aircraftVM.fetchAircraftList()
                     try aircraftTypeVM.fetchTypeList()
                 } catch let details as ErrorDetails {
-                    alertManager.showAlert(.error(details: details))
+                    alertManager.showAlert(title: details.title, message: details.message)
                 } catch {
-                    alertManager.showAlert(.simple(
+                    alertManager.showAlert(
                         title: "Unexpected error:",
-                        message: error.localizedDescription))
+                        message: error.localizedDescription)
                 }
             }
-        ))
+        )
     }
     
     private func newAircraft() {

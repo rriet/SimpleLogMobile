@@ -27,7 +27,7 @@ struct AddEditAircraftView: View {
     
     
     @State private var showAddTypeSheet = false
-    @StateObject var alertManager = AlertManager()
+    @StateObject private var alertManager = AlertManager.shared
     
     let onSave: () -> Void
     
@@ -109,10 +109,6 @@ struct AddEditAircraftView: View {
             }
             .navigationTitle(aircraftToEdit == nil ? "Add Aircraft" : "Edit Aircraft")
             .navigationBarTitleDisplayMode(.inline)
-            
-            .alert(item: $alertManager.currentAlert) { alertInfo in
-                alertManager.getAlert(alertInfo)
-            }
             .sheet(isPresented: $showAddTypeSheet) {
                 AddEditTypeView($selectedType)
             }
@@ -125,7 +121,11 @@ struct AddEditAircraftView: View {
     
     private func initializeFields() {
         if aircraftTypeVM.typeList.isEmpty {
-            try! aircraftTypeVM.fetchTypeList()
+            do {
+                try aircraftTypeVM.fetchTypeList()
+            } catch {
+                handleError(error)
+            }
         }
         guard let receivedAircraft = aircraftToEdit else { return }
         
@@ -141,10 +141,10 @@ struct AddEditAircraftView: View {
             // Revert to old value
             isSimulator = aircraft.isSimulator
             
-            alertManager.showAlert(.simple(
+            alertManager.showAlert(
                 title: "Alert",
                 message: "The selected value cannot be changed because the Aircraft is associated with flights or Simulator Sessions."
-            ))
+            )
             return
         }
     }
@@ -177,14 +177,14 @@ struct AddEditAircraftView: View {
                 onSave()
             } catch let details as ErrorDetails {
                 // Handle specific error details
-                alertManager.showAlert(.error(details: details))
+                alertManager.showAlert(title: details.title, message: details.message)
                 return
             } catch {
                 // Handle unexpected errors
-                alertManager.showAlert(.simple(
+                alertManager.showAlert(
                     title: "Unexpected Error",
                     message: error.localizedDescription
-                ))
+                )
                 return
             }
         }

@@ -1,56 +1,13 @@
 //
-//  AircraftSelector.swift
+//  CrewSelector.swift
 //  SimpleLogMobile
 //
-//  Created by Ricardo Riet Correa on 22/02/2025.
+//  Created by Ricardo Riet Correa on 15/04/2025.
 //
 
 import SwiftUI
 
-struct AircraftInputLine: View {
-    
-    @StateObject private var aircraftVM = AircraftViewModel()
-    
-    @Binding var aircraft: Aircraft?
-    @State private var showAircraftSelector = false
-    
-    var body: some View {
-        HStack {
-            Text("Aircraft")
-                .frame(minWidth: 70, alignment: .leading)
-            if let selectedAircraft = aircraft {
-                Button {
-                    onTapGesture()
-                } label: {
-                    Text(selectedAircraft.toString)
-                        .minimumScaleFactor(0.7)
-                        .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundColor(.theme.foreground)
-                }
-                .buttonStyle(.bordered)
-            } else {
-                Button {
-                    onTapGesture()
-                } label: {
-                    Text("Select aircraft")
-                        .lineLimit(1)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .foregroundColor(.red)
-                }
-                .buttonStyle(.bordered)
-            }
-        }
-        .sheet(isPresented: $showAircraftSelector) {
-            AircraftSelector(aircraft: $aircraft)
-        }
-    }
-    private func onTapGesture() {
-        showAircraftSelector.toggle()
-    }
-}
-
-struct AircraftSelector: View {
+struct CrewSelector: View {
     
     // Environment property to dismiss the current view
     @Environment(\.dismiss) var dismiss

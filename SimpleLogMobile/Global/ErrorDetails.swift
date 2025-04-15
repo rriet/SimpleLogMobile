@@ -10,12 +10,11 @@ import Foundation
 struct ErrorDetails: LocalizedError {
     let title: String
     let message: String
+    let severity: Severity
     
-    var errorDescription: String? {
-        return "\(title): \(message)"
-    }
-    
-    var recoverySuggestion: String? {
-        return message
+    enum Severity {
+        case error
+        case warning
+        case info
     }
 }

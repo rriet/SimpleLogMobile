@@ -18,7 +18,9 @@ func isInteger(_ integerString: String, minValue: Double? = nil, maxValue: Doubl
     guard let intValue = Int(integerString) else {
         throw ErrorDetails(
             title: "Error!",
-            message: "Invalid number format.")
+            message: "Invalid number format.",
+            severity: .error
+        )
     }
     
     // Check if the integer is within the custom range (if provided).
@@ -36,7 +38,9 @@ func isDouble(_ doubleString: String, minValue: Double? = nil, maxValue: Double?
     guard let doubleValue = Double(doubleString) else {
         throw ErrorDetails(
             title: "Error!",
-            message: "Invalid number format.")
+            message: "Invalid number format.",
+            severity: .error
+        )
     }
     
     // Check if the double is within the representable range of Double.
@@ -44,7 +48,9 @@ func isDouble(_ doubleString: String, minValue: Double? = nil, maxValue: Double?
     if doubleValue.isInfinite {
         throw ErrorDetails(
             title: "Error!",
-            message: "Value is too large or too small.")
+            message: "Value is too large or too small.",
+            severity: .error
+        )
     }
     
     // Check the number of decimal places.
@@ -53,7 +59,9 @@ func isDouble(_ doubleString: String, minValue: Double? = nil, maxValue: Double?
     if components.count == 2 && components[1].count > 6 {
         throw ErrorDetails(
             title: "Error!",
-            message: "Input exceeds the allowed number of decimals.")
+            message: "Input exceeds the allowed number of decimals.",
+            severity: .error
+        )
     }
     
     // Check if the double is within the custom range (if provided).
@@ -70,13 +78,17 @@ func numberRange(_ doubleValue: Double, minValue: Double? = nil, maxValue: Doubl
     if let min = minValue, doubleValue < min {
         throw ErrorDetails(
             title: "Error!",
-            message: "Input value below min: \(min).")
+            message: "Input value below min: \(min).",
+            severity: .error
+        )
     }
     
     if let max = maxValue, doubleValue > max {
         throw ErrorDetails(
             title: "Error!",
-            message: "Input value above max: \(max)")
+            message: "Input value above max: \(max)",
+            severity: .error
+        )
     }
 }
 

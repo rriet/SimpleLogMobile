@@ -18,7 +18,7 @@ struct TypesView: View {
     
     @State private var selectedType: AircraftType? = nil
     @State private var showAddEdit = false
-    @StateObject var alertManager = AlertManager()
+    @StateObject private var alertManager = AlertManager.shared
     
     var body: some View {
         VStack {
@@ -55,7 +55,12 @@ struct TypesView: View {
                                         
                                     },
                                     onToggleLock: {
-                                        try! aircraftTypeVM.toggleLocked(aircraftType)
+                                        do {
+                                            try aircraftTypeVM.toggleLocked(aircraftType)
+                                        } catch {
+                                            handleError(error)
+                                        }
+                                        
                                     }
                                 )
                             }
@@ -81,10 +86,6 @@ struct TypesView: View {
                     .background(Color.theme.secondaryBackground)
             }
         }
-        .alert(item: $alertManager.currentAlert) { alertInfo in
-            alertManager.getAlert(alertInfo)
-        }
-
         // Hides the background of the list, so the color propagates from the back
         .scrollContentBackground(.hidden)
         
@@ -103,9 +104,7 @@ struct TypesView: View {
         do {
             try aircraftTypeVM.fetchTypeList()
         } catch {
-            alertManager.showAlert(.simple(
-                title: "Unexpected error:",
-                message: error.localizedDescription))
+            handleError(error)
         }
     }
     
@@ -123,27 +122,23 @@ struct TypesView: View {
         
         // Verify if type has associated aircrafts
         guard typeToDelete.allowDelete else {
-            alertManager.showAlert(.simple(
+            alertManager.showAlert(
                 title: "Cannot Delete Aircraft Type",
-                message: "The selected Type cannot be deleted because it is associated with one or more Aircraft."))
+                message: "The selected Type cannot be deleted because it is associated with one or more Aircraft.")
             return
         }
         
-        alertManager.showAlert(.confirmation(
+        alertManager.showAlert(
             title: "Delete Aircraft Type",
             message: "Are you sure you want to delete this Aircraft Type?",
             confirmAction: {
                 do {
                     try aircraftTypeVM.deleteType(typeToDelete)
                     refreshList()
-                } catch let details as ErrorDetails {
-                    alertManager.showAlert(.error(details: details))
                 } catch {
-                    alertManager.showAlert(.simple(
-                        title: "Unexpected error:",
-                        message: error.localizedDescription))
+                    handleError(error)
                 }
             }
-        ))
+        )
     }
 }

@@ -48,6 +48,7 @@ struct AddEditFlight: View {
     @State private var timeCustom4: Int = 0
     @State private var timeSimInst: Int = 0
     @State private var approachIfr: Int = 0
+    @State private var distance: Int = 0
     @State private var approachType: String = ""
     @State private var remarks: String = ""
     @State private var notes: String = ""
@@ -56,7 +57,7 @@ struct AddEditFlight: View {
     
     @StateObject var alertManager = AlertManager()
     
-    private var count: Int {
+    private var countCrew: Int {
         crewList.count
     }
     
@@ -72,33 +73,24 @@ struct AddEditFlight: View {
         NavigationStack {
             List {
                 Section("Flight") {
-                    InputDate(title: "Date", dateStart: $dateStart)
-                    HStack {
-                        AircraftInputLine(aircraft: $aircraft)
+                    HStack{
+                        InputDate(title: "Date", dateStart: $dateStart)
+                        Spacer()
                         Button {
                             showCrewDropdown
                                 .toggle()
                         } label: {
-                            HStack {
-                                Text(
-                                    "Crew"
-                                )
-                                Image(systemName: showCrewDropdown ? "chevron.up" : "chevron.down")
-                                .font(.system(size: 15,weight: .bold))
-                                .animation(nil, value: showCrewDropdown)
-                            }
-                            
-                            .frame(width: 80, height: 20)
+                            Text("Crew")
                             .overlay(
                                 ZStack {
-                                    if count > 0 {
-                                        Text("\(count)")
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .padding(6)
-                                        .background(Color.red)
-                                        .clipShape(Circle())
-                                        .offset(x: 17, y: -15)
+                                    if countCrew > 0 {
+                                        Text("\(countCrew)")
+                                            .font(.caption)
+                                            .foregroundColor(.white)
+                                            .padding(6)
+                                            .background(Color.red)
+                                            .clipShape(Circle())
+                                            .offset(x: 17, y: -15)
                                     }
                                 },
                                 alignment: .topTrailing
@@ -106,7 +98,7 @@ struct AddEditFlight: View {
                         }
                         .buttonStyle(.bordered)
                     }
-                    
+                    AircraftInputLine(aircraft: $aircraft)
                     if showCrewDropdown {
                         VStack {
                             Button {
@@ -220,14 +212,15 @@ struct AddEditFlight: View {
                             .frame(width: 160)
                         }
                         
-                        Button {
-                            //                        onTapGesture()
-                        } label: {
-                            Text("Calculate")
-                            .frame(maxWidth: .infinity)
-                        }
-                        .buttonStyle(.bordered)
+                        
                     }
+                    Button {
+                        //                        onTapGesture()
+                    } label: {
+                        Text("Calculate")
+                        .frame(maxWidth: .infinity)
+                    }
+                    .buttonStyle(.bordered)
                 }
                 .listSectionSpacing(.compact)
                 
@@ -235,28 +228,16 @@ struct AddEditFlight: View {
                     VStack {
                         Text("Takeoff")
                         .foregroundStyle(Color.theme.secondaryForeground)
-                        HStack {
-                            NumericStepper("Day", value: $takeoffDay, minValue: 0)
-                            NumericStepper("Night", value: $takeoffNight, minValue: 0)
-                        }
+                        NumericStepper("Takeoff Day", value: $takeoffDay, minValue: 0)
+                        NumericStepper("Takeoff Night", value: $takeoffNight, minValue: 0)
                     }
                     VStack {
                         Text("Landings")
                         .foregroundStyle(Color.theme.secondaryForeground)
-                        HStack {
-                            NumericStepper("Day",value: $landingDay, minValue: 0)
-                            NumericStepper("Night",value: $landingNight, minValue: 0)
-                        }
-                    }
-                    
-                    VStack {
-                        Text("IFR Approaches")
-                        .foregroundStyle(Color.theme.secondaryForeground)
-                        HStack {
-                            NumericStepper("", value: $approachIfr, minValue: 0)
-                            Text("Type")
-                            TextField("Approach type", text: $approachType)
-                        }
+                        NumericStepper("Landings Day",value: $landingDay, minValue: 0)
+                        NumericStepper("Landings Night",value: $landingNight, minValue: 0)
+                        NumericStepper("Number of Approaches", value: $approachIfr, minValue: 0)
+                        ApproachSelector(approachType: $approachType)
                     }
                 }
                 .listSectionSpacing(.compact)

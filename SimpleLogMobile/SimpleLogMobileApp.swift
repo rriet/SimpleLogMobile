@@ -9,12 +9,29 @@ import SwiftUI
 
 @main
 struct SimpleLogMobileApp: App {
-//    let viewContext = PersistenceController.shared.container.viewContext
+    
+    // Create AlertManager instance
+    @StateObject private var alertManager = AlertManager.shared
 
     var body: some Scene {
         WindowGroup {
             MainView()
-//                .environment(\.managedObjectContext, viewContext)
+                .alert(
+                    alertManager.title,
+                    isPresented: $alertManager.isPresentingAlert
+                ) {
+                    if let confirmAction = alertManager.confirmAction {
+                        Button("Cancel", role: .cancel) { alertManager.dismissAlert() }
+                        Button("Confirm", role: .destructive) {
+                            confirmAction()
+                            alertManager.dismissAlert()
+                        }
+                    } else {
+                        Button("OK") { alertManager.dismissAlert() }
+                    }
+                } message: {
+                    Text(alertManager.message)
+                }
         }
     }
     

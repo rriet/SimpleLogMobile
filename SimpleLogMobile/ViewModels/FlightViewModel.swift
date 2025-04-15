@@ -183,7 +183,7 @@ class FlightViewModel: ObservableObject {
         do {
             return try viewContext.count(for: request) > 0
         } catch {
-            throw ErrorDetails(title: "Error!", message: "Unknown error reading from database.")
+            throw ErrorDetails(title: "Error!", message: "Unknown error reading from database.",severity: .error)
         }
     }
 
@@ -192,7 +192,7 @@ class FlightViewModel: ObservableObject {
         do {
             return try viewContext.fetch(request).first
         } catch {
-            throw ErrorDetails(title: "Error!", message: "Unknown error reading from database.")
+            throw ErrorDetails(title: "Error!", message: "Unknown error reading from database.",severity: .error)
         }
     }
 }

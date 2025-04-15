@@ -32,7 +32,9 @@ class AircraftTypeViewModel: ObservableObject {
         }catch {
             throw ErrorDetails(
                 title: "Error!",
-                message: "Unknown error fetching aircraft types.")
+                message: "Unknown error fetching aircraft types.",
+                severity: .error
+            )
         }
     }
     
@@ -46,7 +48,9 @@ class AircraftTypeViewModel: ObservableObject {
         }catch {
             throw ErrorDetails(
                 title: "Error!",
-                message: "Unknown error fetching aircraft types.")
+                message: "Unknown error fetching aircraft types.",
+                severity: .error
+            )
         }
     }
     
@@ -69,7 +73,9 @@ class AircraftTypeViewModel: ObservableObject {
         if try checkExist(designator) {
             throw ErrorDetails(
                 title: "Duplicated Type",
-                message: "This Aircraft Type already exists.")
+                message: "This Aircraft Type already exists.",
+                severity: .error
+            )
         }
         
         let isLocked = AppSettings.autoLockNewEntries
@@ -140,8 +146,10 @@ class AircraftTypeViewModel: ObservableObject {
         } catch {
             throw ErrorDetails(
                 title: "Error!",
-                message: "There was an unknown error reading from database.")
-        }   
+                message: "There was an unknown error reading from database.",
+                severity: .error
+            )
+        }
     }
     
     func getAircraftType(_ designator: String) throws -> AircraftType? {
@@ -155,7 +163,9 @@ class AircraftTypeViewModel: ObservableObject {
         } catch {
             throw ErrorDetails(
                 title: "Error!",
-                message: "There was an unknown error reading from the database.")
+                message: "There was an unknown error reading from the database.",
+                severity: .error
+            )
         }
     }
     
@@ -163,7 +173,9 @@ class AircraftTypeViewModel: ObservableObject {
         if designator.count < 3 {
             throw ErrorDetails(
                 title: "Invalid Type",
-                message: "Type designator must be at least 3 characters long.")
+                message: "Type designator must be at least 3 characters long.",
+                severity: .error
+            )
         }
     }
     
@@ -172,13 +184,17 @@ class AircraftTypeViewModel: ObservableObject {
         guard !typeToDelete.isLocked else {
             throw ErrorDetails(
                 title: "Aircraft Locked",
-                message: "The selected Type cannot be deleted because it is locked.")
+                message: "The selected Type cannot be deleted because it is locked.",
+                severity: .error
+            )
         }
         
         guard !typeToDelete.hasAircraft else {
             throw ErrorDetails(
                 title: "Cannot Delete Aircraft Type",
-                message: "The selected Type cannot be deleted because it is associated with one or more Aircraft.")
+                message: "The selected Type cannot be deleted because it is associated with one or more Aircraft.",
+                severity: .error
+            )
         }
         
         viewContext.delete(typeToDelete)
@@ -188,5 +204,11 @@ class AircraftTypeViewModel: ObservableObject {
     func toggleLocked(_ typeToToggle: AircraftType) throws {
         typeToToggle.isLocked.toggle()
         try viewContext.save()
+        
+        // Find and update the item in the list
+        if let index = typeList.firstIndex(where: { $0.objectID == typeToToggle.objectID }) {
+            let updatedObject = try viewContext.existingObject(with: typeToToggle.objectID) as! AircraftType
+            typeList[index] = updatedObject
+        }
     }
 }

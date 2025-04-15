@@ -52,7 +52,7 @@ class AircraftViewModel: ObservableObject {
         }catch {
             throw ErrorDetails(
                 title: "Error!",
-                message: "Unknown error fetching aircrafts.")
+                message: "Unknown error fetching aircrafts.",severity: .error)
         }
     }
     
@@ -93,7 +93,7 @@ class AircraftViewModel: ObservableObject {
         if registration.count < 3 {
             throw ErrorDetails(
                 title: "Invalid Registration",
-                message: "Registration must be at least 3 characters long.")
+                message: "Registration must be at least 3 characters long.",severity: .error)
         }
         
         aircraftToEdit.registration = registration.uppercased().trimmingCharacters(in: .whitespaces)
@@ -117,7 +117,7 @@ class AircraftViewModel: ObservableObject {
         } catch {
             throw ErrorDetails(
                 title: "Error!",
-                message: "There was an unknown error reading from database.")
+                message: "There was an unknown error reading from database.",severity: .error)
         }
     }
     
@@ -132,7 +132,7 @@ class AircraftViewModel: ObservableObject {
         } catch {
             throw ErrorDetails(
                 title: "Error!",
-                message: "There was an unknown error reading from the database.")
+                message: "There was an unknown error reading from the database.",severity: .error)
         }
     }
     
@@ -141,28 +141,34 @@ class AircraftViewModel: ObservableObject {
         guard !aircraftToDelete.isLocked else {
             throw ErrorDetails(
                 title: "Aircraft Locked",
-                message: "The selected Aircraft cannot be deleted because it is locked.")
+                message: "The selected Aircraft cannot be deleted because it is locked.",severity: .error)
         }
         
         guard !aircraftToDelete.hasFlights else {
             throw ErrorDetails(
                 title: "Cannot Delete Aircraft",
-                message: "The selected Aircraft cannot be deleted because it is associated with one or more Aircraft.")
+                message: "The selected Aircraft cannot be deleted because it is associated with one or more Aircraft.",severity: .error)
         }
         
         guard !aircraftToDelete.hasSimTrainingArray else {
             throw ErrorDetails(
                 title: "Cannot Delete Aircraft",
-                message: "The selected Aircraft cannot be deleted because it is associated with one or more Simulator Training.")
+                message: "The selected Aircraft cannot be deleted because it is associated with one or more Simulator Training.",severity: .error)
         }
         
         viewContext.delete(aircraftToDelete)
         try viewContext.save()
     }
     
-    func toggleLocked(_ typeToToggle: Aircraft) throws {
-        typeToToggle.isLocked.toggle()
+    func toggleLocked(_ aircraftToToggle: Aircraft) throws {
+        aircraftToToggle.isLocked.toggle()
         try viewContext.save()
+        
+        // Find and update the item in the list
+        if let index = aircraftList.firstIndex(where: { $0.objectID == aircraftToToggle.objectID }) {
+            let updatedObject = try viewContext.existingObject(with: aircraftToToggle.objectID) as! Aircraft
+            aircraftList[index] = updatedObject
+        }
     }
     
     func toggleFavorite(_ aircraftToToggle: Aircraft) throws {

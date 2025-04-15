@@ -36,7 +36,7 @@ struct AddEditTypeView: View {
     @State private var highPerformance: Bool = true
     
     // StateObject to manage alert presentation
-    @StateObject var alertManager = AlertManager()
+    @StateObject private var alertManager = AlertManager.shared
     @State private var showFamilyPicker: Bool = false
     
     // Custom initializer to pass the typeToEdit binding
@@ -76,14 +76,11 @@ struct AddEditTypeView: View {
                     .buttonStyle(.bordered)
                     .disabled(families.isEmpty)
                 }
-                
-                
                 InputField(
                     "Maker",
                     textValue: $maker,
                     capitalization: .sentences
                 )
-                
                 NumericField(
                     "MTOW",
                     textValue: $mtow,
@@ -132,9 +129,6 @@ struct AddEditTypeView: View {
             }
         }
         .onAppear { initializeFields() } // Initialize form fields if editing
-        .alert(item: $alertManager.currentAlert) { alertInfo in
-            alertManager.getAlert(alertInfo) // Show alerts for errors or confirmations
-        }
         .sheet(isPresented: $showFamilyPicker) {
             FamilySelector(family: $family)
                 .presentationDetents([.medium])
@@ -219,19 +213,15 @@ struct AddEditTypeView: View {
                     highPerformance: highPerformance
                 )
             }
-        } catch let details as ErrorDetails {
-            // Handle specific error details
-            alertManager.showAlert(.error(details: details))
-            return
         } catch {
-            // Handle unexpected errors
-            alertManager.showAlert(.simple(
-                title: "Unexpected Error",
-                message: error.localizedDescription
-            ))
+            handleError(error)
             return
         }
-        try! aircraftTypeVM.fetchTypeList()
+        do {
+            try aircraftTypeVM.fetchTypeList()
+        } catch {
+            handleError(error)
+        }
         // Dismiss the view after a successful save
         dismiss()
     }

@@ -17,7 +17,7 @@ struct AirportsView: View {
     @State private var selectedAirport: Airport?
     @State private var showAddEdit = false
     @State private var showOnMap = false
-    @StateObject var alertManager = AlertManager()
+    @StateObject private var alertManager = AlertManager.shared
     
     var body: some View {
         VStack {
@@ -30,7 +30,11 @@ struct AirportsView: View {
                     .autocorrectionDisabled()
                     .minimumScaleFactor(0.8)
                     .onChange(of: searchText) { oldValue , newValue in
-                        try! airportVM.fetchAirportList(searchText: newValue, refresh: true)
+                        do {
+                            try airportVM.fetchAirportList(searchText: newValue, refresh: true)
+                        } catch {
+                            handleError(error)
+                        }
                     }
                 Button {
                     newAirport()
@@ -56,14 +60,26 @@ struct AirportsView: View {
                                 showAirport(airport)
                             },
                             onToggleLock: {
-                                try! airportVM.toggleLocked(airport)
+                                do {
+                                    try airportVM.toggleLocked(airport)
+                                } catch {
+                                    handleError(error)
+                                }
                             },
                             onToggleFavorite: {
-                                try! airportVM.toggleFavorite(airport)
+                                do {
+                                    try airportVM.toggleFavorite(airport)
+                                } catch {
+                                    handleError(error)
+                                }
                             })
                         .onAppear {
                             if airport == airportVM.airportList.last {
-                                try! airportVM.fetchAirportList(offset: airportVM.airportList.count, searchText: searchText)
+                                do {
+                                    try airportVM.fetchAirportList(offset: airportVM.airportList.count, searchText: searchText)
+                                } catch {
+                                    handleError(error)
+                                }
                             }
                         }
                         
@@ -88,15 +104,16 @@ struct AirportsView: View {
                     .background(Color.theme.secondaryBackground)
             }
         }
-        .alert(item: $alertManager.currentAlert) { alertInfo in
-            alertManager.getAlert(alertInfo)
-        }
         .sheet(isPresented: $showAddEdit) {
             AddEditAirportView(
                 $selectedAirport,
                 airportVM: airportVM,
                 onSave: {
-                    try! airportVM.fetchAirportList(searchText: searchText, refresh: true)
+                    do {
+                        try airportVM.fetchAirportList(searchText: searchText, refresh: true)
+                    } catch {
+                        handleError(error)
+                    }
                 })
                 .interactiveDismissDisabled()
         }
@@ -104,7 +121,11 @@ struct AirportsView: View {
             ShowMapView(airport: $selectedAirport)
         }
         .onAppear{
-            try! airportVM.fetchAirportList()
+            do {
+                try airportVM.fetchAirportList(refresh: true)
+            } catch {
+                handleError(error)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(Color.theme.secondaryBackground))
@@ -122,35 +143,31 @@ struct AirportsView: View {
         
         // Verify if type has associated flight
         if airportToDelete.hasFlights {
-            alertManager.showAlert(.simple(
+            alertManager.showAlert(
                 title: "Cannot Delete Airport",
-                message: "The selected Airport cannot be deleted because it is associated with one or more flights."))
+                message: "The selected Airport cannot be deleted because it is associated with one or more flights.")
             return
         }
         
         // Verify if type has associated positioning
         if airportToDelete.hasPositioning {
-            alertManager.showAlert(.simple(
+            alertManager.showAlert(
                 title: "Cannot Delete Airport",
-                message: "The selected Airport cannot be deleted because it is associated with one or more Positioning Duty."))
+                message: "The selected Airport cannot be deleted because it is associated with one or more Positioning Duty.")
             return
         }
         
-        alertManager.showAlert(.confirmation(
+        alertManager.showAlert(
             title: "Delete Airport",
             message: "Are you sure you want to delete this Airport?",
             confirmAction: {
                 do {
                     try airportVM.deleteAirport(airportToDelete)
-                } catch let details as ErrorDetails {
-                    alertManager.showAlert(.error(details: details))
                 } catch {
-                    alertManager.showAlert(.simple(
-                        title: "Unexpected error:",
-                        message: error.localizedDescription))
+                    handleError(error)
                 }
             }
-        ))
+        )
     }
     
     private func newAirport() {
@@ -163,4 +180,3 @@ struct AirportsView: View {
         showAddEdit.toggle()
     }
 }
-

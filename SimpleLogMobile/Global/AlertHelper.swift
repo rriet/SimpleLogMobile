@@ -7,41 +7,41 @@
 
 import SwiftUI
 
-enum AlertConfiguration {
-    case simple(title: String, message: String)
-    case confirmation(title: String, message: String, confirmAction: () -> Void)
-    case error(details: ErrorDetails)
-}
-
-struct AlertInfo: Identifiable {
-    let id = UUID()
-    let configuration: AlertConfiguration
-}
-
 class AlertManager: ObservableObject {
-    @Published var currentAlert: AlertInfo?
+    static let shared = AlertManager()
     
-    func showAlert(_ configuration: AlertConfiguration) {
-        currentAlert = AlertInfo(configuration: configuration)
+    @Published var isPresentingAlert: Bool = false
+    @Published var title: String = ""
+    @Published var message: String = ""
+    @Published var confirmAction: (() -> Void)?
+    
+    func showAlert(title: String, message:String, confirmAction:(() -> Void)? = nil) {
+        // delay 0.01 seconds to allow a alert to trigger another alert.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            self.title = title
+            self.message = message
+            self.confirmAction = confirmAction
+            self.isPresentingAlert = true
+        }
     }
     
-    func getAlert(_ alertInfo: AlertInfo) -> Alert {
-        switch alertInfo.configuration {
-            case .simple(let title, let message):
-                return Alert(title: Text(title), message: Text(message), dismissButton: .default(Text("OK")))
-            case .confirmation(let title, let message, let confirmAction):
-                return Alert(
-                    title: Text(title),
-                    message: Text(message),
-                    primaryButton: .destructive(Text("Confirm"), action: confirmAction),
-                    secondaryButton: .cancel()
-                )
-            case .error(let details):
-                return Alert(
-                    title: Text(details.title),
-                    message: Text(details.message),
-                    dismissButton: .default(Text("OK"))
-                )
+    func dismissAlert() {
+        DispatchQueue.main.async {
+            self.isPresentingAlert = false
         }
+    }
+}
+
+func handleError(_ error: Error) {
+    if let details = error as? ErrorDetails {
+        AlertManager.shared.showAlert(
+            title: details.title,
+            message: details.message
+        )
+    } else {
+        AlertManager.shared.showAlert(
+            title: "Unexpected Error",
+            message: error.localizedDescription
+        )
     }
 }
