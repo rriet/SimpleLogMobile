@@ -26,7 +26,7 @@ public class FlightCrew: NSManagedObject, Comparable {
     }
 }
 
-enum CrewPosition: String, Codable, CaseIterable {
+enum CrewPosition: String, Codable, CaseIterable, Hashable {
     case PIC = "PIC"
     case SIC = "SIC"
     case Instructor = "Instructor"

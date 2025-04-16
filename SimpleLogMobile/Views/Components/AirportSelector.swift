@@ -95,7 +95,6 @@ struct AirportSelector: View {
                                 Text(airport.toString)
                                     .minimumScaleFactor(0.7)
                                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                                    .background(Color.theme.background)
                                     .onTapGesture {
                                         self.airport = airport
                                         dismiss()

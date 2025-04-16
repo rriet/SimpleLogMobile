@@ -92,7 +92,6 @@ struct AircraftSelector: View {
                             HStack{
                                 Text(aircraft.toString)
                                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-                                    .background(Color.theme.background)
                                     .onTapGesture {
                                         self.aircraft = aircraft
                                         dismiss()

@@ -30,9 +30,12 @@ struct AddEditCrewView: View {
     @State private var isCamera = false
     @StateObject private var alertManager = AlertManager.shared
     
-    init(_ crew: Binding<Crew?>, crewVM: CrewViewModel) {
+    let onSave: (Crew?) -> Void
+    
+    init(_ crew: Binding<Crew?>, crewVM: CrewViewModel, onSave: @escaping (Crew?) -> Void = { _ in }) {
         self.crewVM = crewVM
         self._crewToEdit = crew
+        self.onSave = onSave
     }
     
     var body: some View {
@@ -191,7 +194,7 @@ struct AddEditCrewView: View {
         do {
             if crewToEdit == nil {
                 // Adding a new Crew
-                _ = try crewVM.addCrew(
+                crewToEdit = try crewVM.addCrew(
                     name: name,
                     email: email,
                     phone: phone,
@@ -213,6 +216,7 @@ struct AddEditCrewView: View {
                     isSelf: isSelf
                 )
             }
+            onSave(crewToEdit)
         } catch let details as ErrorDetails {
             // Handle specific error details
             alertManager.showAlert(title: details.title, message: details.message)

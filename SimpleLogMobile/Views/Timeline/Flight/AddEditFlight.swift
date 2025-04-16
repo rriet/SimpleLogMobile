@@ -53,13 +53,8 @@ struct AddEditFlight: View {
     @State private var remarks: String = ""
     @State private var notes: String = ""
     @State var crewList: [Crew: CrewPosition] = [:]
-    @State private var showCrewDropdown: Bool = false
     
     @StateObject var alertManager = AlertManager()
-    
-    private var countCrew: Int {
-        crewList.count
-    }
     
     init(
         _ flight: Binding<Flight?>,
@@ -76,69 +71,9 @@ struct AddEditFlight: View {
                     HStack{
                         InputDate(title: "Date", dateStart: $dateStart)
                         Spacer()
-                        Button {
-                            showCrewDropdown
-                                .toggle()
-                        } label: {
-                            Text("Crew")
-                            .overlay(
-                                ZStack {
-                                    if countCrew > 0 {
-                                        Text("\(countCrew)")
-                                            .font(.caption)
-                                            .foregroundColor(.white)
-                                            .padding(6)
-                                            .background(Color.red)
-                                            .clipShape(Circle())
-                                            .offset(x: 17, y: -15)
-                                    }
-                                },
-                                alignment: .topTrailing
-                            )
-                        }
-                        .buttonStyle(.bordered)
+                        CrewButton(crewList: $crewList)
                     }
                     AircraftInputLine(aircraft: $aircraft)
-                    if showCrewDropdown {
-                        VStack {
-                            Button {
-                                showCrewDropdown.toggle()
-                            } label: {
-                                Text("Select Crew")
-                            }
-                            .buttonStyle(.bordered)
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            
-                            Grid(
-                                alignment: .centerFirstTextBaseline,
-                                horizontalSpacing: 8,
-                                verticalSpacing: 5
-                            ) {
-                                let crewArray = Array(crewList.keys)
-                                ForEach(crewArray, id: \.objectID) { crew in
-                                    GridRow {
-                                        Text(crew.name ?? "")
-                                            .font(.subheadline)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                            .minimumScaleFactor(0.8)
-                                        Text("\(crewList[crew]?.rawValue ?? "")")
-                                            .font(.caption)
-                                        Button {
-                                            showCrewDropdown.toggle()
-                                        } label: {
-                                            Image(systemName: "person.badge.minus")
-                                            .font(.system(size: 15, weight: .bold))
-                                        }
-                                        .padding(6)
-                                        .buttonStyle(.bordered)
-                                        .foregroundColor(.red)
-                                    }
-                                }
-                            }
-                            .font(.headline)
-                            .lineLimit(1)
-                        }
-                    }
                     VStack(alignment: .leading) {
                         AirportInputLine(airport: $airportDep, label: "From")
                         
@@ -214,26 +149,26 @@ struct AddEditFlight: View {
                         
                         
                     }
-                    Button {
-                        //                        onTapGesture()
-                    } label: {
-                        Text("Calculate")
-                        .frame(maxWidth: .infinity)
+                    HStack{
+                        Text("")
+                        Button {
+                            //                        onTapGesture()
+                        } label: {
+                            Text("Calculate")
+                            .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.bordered)
                     }
-                    .buttonStyle(.bordered)
+                    
                 }
                 .listSectionSpacing(.compact)
                 
                 Section {
                     VStack {
-                        Text("Takeoff")
+                        Text("Takeoffs & Landings")
                         .foregroundStyle(Color.theme.secondaryForeground)
                         NumericStepper("Takeoff Day", value: $takeoffDay, minValue: 0)
                         NumericStepper("Takeoff Night", value: $takeoffNight, minValue: 0)
-                    }
-                    VStack {
-                        Text("Landings")
-                        .foregroundStyle(Color.theme.secondaryForeground)
                         NumericStepper("Landings Day",value: $landingDay, minValue: 0)
                         NumericStepper("Landings Night",value: $landingNight, minValue: 0)
                         NumericStepper("Number of Approaches", value: $approachIfr, minValue: 0)
@@ -257,7 +192,7 @@ struct AddEditFlight: View {
                         //                        saveCrew()
                     }
                     .disabled(
-                        //                        isNameInvalid
+                        //                        isFlightInvalid
                         true
                     )
                 }
